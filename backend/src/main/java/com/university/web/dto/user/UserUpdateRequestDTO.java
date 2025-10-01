@@ -17,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserUpdateRequestDTO {
     private String username;
+    private String email;
     private String firstName;
     private String lastName;
     @Pattern(regexp = "\\d{9}", message = "Phone number must have 9 digits")

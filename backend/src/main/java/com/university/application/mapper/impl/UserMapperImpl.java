@@ -37,6 +37,7 @@ public class UserMapperImpl implements UserMapper {
     @Override
     public void updateEntity(User user, UserUpdateRequestDTO dto) {
         if (dto.getUsername() != null) user.setUsername(dto.getUsername());
+        if(dto.getEmail() != null) user.setEmail(dto.getEmail());
         if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
         if (dto.getLastName() != null) user.setLastName(dto.getLastName());
         if (dto.getPhoneNumber() != null) user.setPhoneNumber(dto.getPhoneNumber());
