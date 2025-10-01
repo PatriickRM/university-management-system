@@ -27,7 +27,11 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
     }
-
+    //Generar token con claims adicionales
+    public String generateToken(UserDetails userDetails, Map<String, Object> extraClaims) {
+        Map<String, Object> claims = new HashMap<>(extraClaims);
+        return createToken(claims, userDetails.getUsername());
+    }
     //Crear token
     private String createToken(Map<String, Object>claims, String subject){
         Date now = new Date();
