@@ -1,6 +1,7 @@
 package com.university.application.service.impl;
 
 import com.university.domain.model.Student;
+import com.university.domain.repository.ProfessorRepository;
 import com.university.domain.repository.StudentRepository;
 import com.university.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserSecurityService {
     private final StudentRepository studentRepository;
+    private final ProfessorRepository professorRepository;
 
+    // Verificar si es dueño del User
     public boolean isOwner(Long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!isAuthenticated(auth)) return false;
@@ -27,6 +30,7 @@ public class UserSecurityService {
         return authUserId != null && Objects.equals(userId, authUserId);
     }
 
+    // Verificar si es dueño del Student
     public boolean isStudentOwner(Long studentId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!isAuthenticated(auth)) return false;
@@ -41,6 +45,7 @@ public class UserSecurityService {
                 .orElse(false);
     }
 
+    // Verificar si es dueño del Student por código
     public boolean isStudentOwnerByCode(String studentCode) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!isAuthenticated(auth)) return false;
@@ -54,8 +59,41 @@ public class UserSecurityService {
                 .map(s -> Objects.equals(s.getStudentCode(), studentCode))
                 .orElse(false);
     }
+    // Verificar si es dueño del Professor
+    public boolean isProfessorOwner(Long professorId) {
+        if (professorId == null) return false;
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!isAuthenticated(auth)) return false;
 
+        if (isAdmin(auth)) return true;
+
+        Long authUserId = getAuthenticatedUserId(auth);
+        if (authUserId == null) return false;
+
+        return professorRepository.findByUserId(authUserId)
+                .map(p -> Objects.equals(p.getId(), professorId))
+                .orElse(false);
+    }
+
+    // Verificar si es dueño del Professor por código de empleado
+    public boolean isProfessorOwnerByCode(String employeeCode) {
+        if (employeeCode == null || employeeCode.isBlank()) return false;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!isAuthenticated(auth)) return false;
+
+        if (isAdmin(auth)) return true;
+
+        Long authUserId = getAuthenticatedUserId(auth);
+        if (authUserId == null) return false;
+
+        return professorRepository.findByUserId(authUserId)
+                .map(p -> Objects.equals(p.getEmployeeCode(), employeeCode))
+                .orElse(false);
+    }
+
+    // Métodos auxiliares privados
     private boolean isAuthenticated(Authentication auth) {
         return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
     }
