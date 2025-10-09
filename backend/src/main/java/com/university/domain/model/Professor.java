@@ -1,5 +1,6 @@
 package com.university.domain.model;
 
+import com.university.domain.model.enums.EmploymentType;
 import com.university.domain.model.enums.ProfessorStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
