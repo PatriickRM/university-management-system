@@ -2,6 +2,7 @@ package com.university.web.dto.professor;
 
 import com.university.domain.model.enums.EmploymentType;
 import com.university.domain.model.enums.ProfessorStatus;
+import com.university.web.dto.department.DepartmentBasicDTO;
 import com.university.web.dto.user.UserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
