@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "academic_periods")
@@ -32,4 +33,7 @@ public class AcademicPeriod {
 
     @Enumerated(EnumType.STRING)
     private PeriodStatus status;
+
+    @OneToMany(mappedBy = "academicPeriod")
+    private List<CourseOffering> courseOfferings;
 }
