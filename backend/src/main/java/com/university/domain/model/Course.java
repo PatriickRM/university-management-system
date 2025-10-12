@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "courses")
 @Data
@@ -14,7 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Course {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_course")
@@ -38,4 +39,7 @@ public class Course {
 
     @Enumerated(EnumType.STRING)
     private CourseStatus status;
+
+    @OneToMany(mappedBy = "course")
+    private List<CourseOffering> courseOfferings;
 }
