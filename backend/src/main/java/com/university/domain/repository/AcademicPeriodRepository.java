@@ -14,7 +14,7 @@ public interface AcademicPeriodRepository extends JpaRepository<AcademicPeriod, 
     boolean existsByPeriodCode(String periodCode);
     List<AcademicPeriod> findByStatus(PeriodStatus status);
     // Obtener el período activo actual
-    @Query("SELECT ap FROM AcademicPeriod ap WHERE ap.status = 'ACTIVE'")
+    @Query("SELECT ap FROM AcademicPeriod ap WHERE ap.status = 'ACTIVO'")
     Optional<AcademicPeriod> findActivePeriod();
     // Buscar períodos por año
     @Query("SELECT ap FROM AcademicPeriod ap WHERE ap.periodCode LIKE :year%")

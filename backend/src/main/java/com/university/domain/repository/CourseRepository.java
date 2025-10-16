@@ -18,6 +18,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByCredits(Integer credits);
 
     // Buscar cursos activos por departamento
-    @Query("SELECT c FROM Course c WHERE c.department.id = :departmentId AND c.status = 'ACTIVE'")
+    @Query("SELECT c FROM Course c WHERE c.department.id = :departmentId AND c.status = 'ACTIVO'")
     List<Course> findActiveByDepartment(@Param("departmentId") Long departmentId);
 }
