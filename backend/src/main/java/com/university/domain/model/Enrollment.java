@@ -34,4 +34,5 @@ public class Enrollment {
     @Enumerated(EnumType.STRING)
     private EnrollmentStatus status;
 
+    private Double finalGrade;
 }
