@@ -42,6 +42,7 @@ public class ProfessorMapperImpl implements ProfessorMapper {
         return ProfessorResponseDTO.builder()
                 .id(professor.getId())
                 .employeeCode(professor.getEmployeeCode())
+                .employmentType(professor.getEmploymentType())
                 .hireDate(professor.getHireDate())
                 .officeLocation(professor.getOfficeLocation())
                 .specialization(professor.getSpecialization())
