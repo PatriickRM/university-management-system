@@ -1,39 +1,182 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
-@use '@angular/material' as mat;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-html {
-  @include mat.theme((
-    color: (
-      primary: mat.$rose-palette,
-      tertiary: mat.$red-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+html, body {
+  height: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
+  background: #f5f7fa;
 }
-/* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* Snackbar Styles */
+.success-snackbar {
+  background: #4caf50 !important;
+  color: white !important;
+
+  .mat-mdc-simple-snack-bar {
+    color: white;
+  }
+
+  .mat-mdc-button {
+    color: white !important;
+  }
+}
+
+.error-snackbar {
+  background: #f44336 !important;
+  color: white !important;
+
+  .mat-mdc-simple-snack-bar {
+    color: white;
+  }
+
+  .mat-mdc-button {
+    color: white !important;
+  }
+}
+
+.warning-snackbar {
+  background: #ff9800 !important;
+  color: white !important;
+
+  .mat-mdc-simple-snack-bar {
+    color: white;
+  }
+
+  .mat-mdc-button {
+    color: white !important;
+  }
+}
+
+.info-snackbar {
+  background: #2196f3 !important;
+  color: white !important;
+
+  .mat-mdc-simple-snack-bar {
+    color: white;
+  }
+
+  .mat-mdc-button {
+    color: white !important;
+  }
+}
+
+/* Loading Spinner */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #666;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+  }
+
+  p {
+    margin: 0;
+    color: #999;
+  }
+}
+
+/* Card Hover Effect */
+.hover-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+
+  &:hover {
+    background: #555;
+  }
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gap-8 {
+  gap: 8px;
+}
+
+.gap-16 {
+  gap: 16px;
+}

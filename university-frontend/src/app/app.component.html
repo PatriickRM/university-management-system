@@ -1,0 +1,84 @@
+@if (isLoginPage()) {
+  <router-outlet></router-outlet>
+} @else {
+  @if (currentUser$ | async; as user) {
+    <mat-sidenav-container class="sidenav-container">
+      <!-- Sidenav -->
+      <mat-sidenav #sidenav mode="side" opened class="sidenav">
+        <div class="sidenav-header">
+          <mat-icon class="logo-icon">school</mat-icon>
+          <h2>SGU</h2>
+        </div>
+
+        <mat-nav-list>
+          @for (item of menuItems; track item.route) {
+            @if (canShowMenuItem(item)) {
+              <a mat-list-item 
+                 [routerLink]="item.route"
+                 routerLinkActive="active-link"
+                 [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}">
+                <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+                <span matListItemTitle>{{ item.label }}</span>
+              </a>
+            }
+          }
+        </mat-nav-list>
+      </mat-sidenav>
+
+      <!-- Main Content -->
+      <mat-sidenav-content>
+        <!-- Toolbar -->
+        <mat-toolbar color="primary" class="toolbar">
+          <button mat-icon-button (click)="sidenav.toggle()">
+            <mat-icon>menu</mat-icon>
+          </button>
+
+          <span class="toolbar-title">Sistema de Gestión Universitaria</span>
+
+          <span class="spacer"></span>
+
+          <!-- User Menu -->
+          <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+            <div class="user-avatar">
+              {{ getUserInitials(user.firstName, user.lastName) }}
+            </div>
+            <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+            <mat-icon>arrow_drop_down</mat-icon>
+          </button>
+
+          <mat-menu #userMenu="matMenu">
+            <div class="user-menu-header">
+              <p class="user-email">{{ user.email }}</p>
+              <div class="user-roles">
+                @for (role of user.roles; track role.id) {
+                  <span class="role-chip">{{ role.name }}</span>
+                }
+              </div>
+            </div>
+            <mat-divider></mat-divider>
+            <button mat-menu-item>
+              <mat-icon>account_circle</mat-icon>
+              <span>Mi Perfil</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>settings</mat-icon>
+              <span>Configuración</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon color="warn">exit_to_app</mat-icon>
+              <span>Cerrar Sesión</span>
+            </button>
+          </mat-menu>
+        </mat-toolbar>
+
+        <!-- Page Content -->
+        <div class="content">
+          <router-outlet></router-outlet>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  } @else {
+    <router-outlet></router-outlet>
+  }
+}
