@@ -35,97 +35,168 @@ export class DashboardComponent implements OnInit {
   currentUser$ = this.authService.currentUser$;
   cards: DashboardCard[] = [];
 
+  userRole: string = '';
+  dashboardTitle: string = '';
+  dashboardSubtitle: string = '';
+  stats: any[] = [];
+
   ngOnInit(): void {
+    this.determineUserRole();
     this.loadDashboardCards();
+    this.loadStats();
+  }
+
+  determineUserRole(): void {
+    if (this.authService.hasRole('ADMIN')) {
+      this.userRole = 'ADMIN';
+      this.dashboardTitle = 'Panel de Administración';
+      this.dashboardSubtitle = 'Gestiona todo el sistema universitario';
+    } else if (this.authService.hasRole('STUDENT')) {
+      this.userRole = 'STUDENT';
+      this.dashboardTitle = 'Mi Portal Estudiantil';
+      this.dashboardSubtitle = 'Accede a tus cursos y calificaciones';
+    } else if (this.authService.hasRole('PROFESSOR')) {
+      this.userRole = 'PROFESSOR';
+      this.dashboardTitle = 'Portal del Profesor';
+      this.dashboardSubtitle = 'Gestiona tus cursos y estudiantes';
+    }
   }
 
   loadDashboardCards(): void {
-    const user = this.authService.getCurrentUser();
-    const isAdmin = this.authService.hasRole('ADMIN');
-    const isStudent = this.authService.hasRole('STUDENT');
-    const isProfessor = this.authService.hasRole('PROFESSOR');
-
     this.cards = [];
 
-    if (isAdmin) {
-      this.cards.push(
+    if (this.userRole === 'ADMIN') {
+      this.cards = [
         {
           title: 'Estudiantes',
-          value: 'Gestionar',
+          value: 'Gestión Total',
           icon: 'school',
           color: '#3f51b5',
           route: '/students'
         },
         {
           title: 'Profesores',
-          value: 'Gestionar',
+          value: 'Gestión Total',
           icon: 'person',
           color: '#009688',
           route: '/professors'
         },
         {
           title: 'Cursos',
-          value: 'Gestionar',
+          value: 'Catálogo',
           icon: 'book',
           color: '#ff9800',
           route: '/courses'
         },
         {
           title: 'Matrículas',
-          value: 'Gestionar',
+          value: 'Control',
           icon: 'assignment',
           color: '#e91e63',
           route: '/enrollments'
-        }
-      );
-    } else if (isStudent) {
-      this.cards.push(
-        {
-          title: 'Mis Cursos',
-          value: 'Ver',
-          icon: 'book',
-          color: '#3f51b5',
-          route: '/enrollments'
         },
         {
-          title: 'Matrícula',
-          value: 'Inscribirse',
+          title: 'Períodos',
+          value: 'Académicos',
+          icon: 'calendar_today',
+          color: '#9c27b0',
+          route: '/periods'
+        },
+        {
+          title: 'Departamentos',
+          value: 'Gestionar',
+          icon: 'business',
+          color: '#607d8b',
+          route: '/departments'
+        }
+      ];
+    } else if (this.userRole === 'STUDENT') {
+      this.cards = [
+        {
+          title: 'Mis Matrículas',
+          value: 'Activas',
           icon: 'assignment',
-          color: '#009688',
-          route: '/courses'
+          color: '#3f51b5',
+          route: '/enrollments/my-enrollments'
         },
         {
-          title: 'Mi Perfil',
-          value: 'Ver',
-          icon: 'account_circle',
+          title: 'Cursos Disponibles',
+          value: 'Inscribirse',
+          icon: 'book',
+          color: '#009688',
+          route: '/courses/available'
+        },
+        {
+          title: 'Mis Calificaciones',
+          value: 'Ver Notas',
+          icon: 'grade',
           color: '#ff9800',
-          route: '/students'
+          route: '/grades'
+        },
+        {
+          title: 'Mi Horario',
+          value: 'Ver',
+          icon: 'schedule',
+          color: '#e91e63',
+          route: '/schedule'
         }
-      );
-    } else if (isProfessor) {
-      this.cards.push(
+      ];
+    } else if (this.userRole === 'PROFESSOR') {
+      this.cards = [
         {
           title: 'Mis Cursos',
-          value: 'Ver',
+          value: 'Asignados',
           icon: 'book',
           color: '#3f51b5',
-          route: '/courses'
+          route: '/courses/my-courses'
         },
         {
-          title: 'Estudiantes',
-          value: 'Ver',
+          title: 'Mis Estudiantes',
+          value: 'Matriculados',
           icon: 'school',
           color: '#009688',
-          route: '/students'
+          route: '/students/my-students'
         },
         {
-          title: 'Mi Perfil',
-          value: 'Ver',
-          icon: 'account_circle',
+          title: 'Calificaciones',
+          value: 'Gestionar',
+          icon: 'grade',
           color: '#ff9800',
-          route: '/professors'
+          route: '/grades/manage'
+        },
+        {
+          title: 'Asistencia',
+          value: 'Registrar',
+          icon: 'checklist',
+          color: '#e91e63',
+          route: '/attendance'
         }
-      );
+      ];
+    }
+  }
+
+  loadStats(): void {
+    if (this.userRole === 'ADMIN') {
+      this.stats = [
+        { label: 'Total Estudiantes', value: '1,234', trend: '+12%', icon: 'trending_up', color: '#4caf50' },
+        { label: 'Total Profesores', value: '156', trend: '+5%', icon: 'trending_up', color: '#4caf50' },
+        { label: 'Cursos Activos', value: '89', trend: '0%', icon: 'remove', color: '#ff9800' },
+        { label: 'Matrículas Hoy', value: '45', trend: '+8%', icon: 'trending_up', color: '#4caf50' }
+      ];
+    } else if (this.userRole === 'STUDENT') {
+      this.stats = [
+        { label: 'Cursos Actuales', value: '5', trend: '', icon: 'book', color: '#3f51b5' },
+        { label: 'Promedio General', value: '16.8', trend: '+0.5', icon: 'trending_up', color: '#4caf50' },
+        { label: 'Créditos', value: '45/120', trend: '', icon: 'school', color: '#009688' },
+        { label: 'Asistencia', value: '92%', trend: '', icon: 'check_circle', color: '#4caf50' }
+      ];
+    } else if (this.userRole === 'PROFESSOR') {
+      this.stats = [
+        { label: 'Cursos Asignados', value: '3', trend: '', icon: 'book', color: '#3f51b5' },
+        { label: 'Total Estudiantes', value: '87', trend: '', icon: 'school', color: '#009688' },
+        { label: 'Calificaciones Pendientes', value: '12', trend: '', icon: 'pending', color: '#ff9800' },
+        { label: 'Asistencias del Día', value: '3/3', trend: '', icon: 'check_circle', color: '#4caf50' }
+      ];
     }
   }
 

@@ -17,24 +17,26 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
-  /*{
+  {
     path: 'students',
-    loadComponent: () => import('./features/students/student-list/student-list.component').then(m => m.StudentListComponent),
+    loadComponent: () => import('../app/features/student/student-list.component').then(m => m.StudentListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'STUDENT'] }
   },
   {
     path: 'students/create',
-    loadComponent: () => import('./features/students/student-form/student-form.component').then(m => m.StudentFormComponent),
+    loadComponent: () => import('../app/features/student/student-list.component').then(m => m.StudentListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
+  
   {
     path: 'professors',
-    loadComponent: () => import('./features/professors/professor-list/professor-list.component').then(m => m.ProfessorListComponent),
+    loadComponent: () => import('../app/features/professor/professor-list.component').then(m => m.ProfessorListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'PROFESSOR'] }
   },
+  /*
   {
     path: 'courses',
     loadComponent: () => import('./features/courses/course-list/course-list.component').then(m => m.CourseListComponent),

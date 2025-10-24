@@ -39,3 +39,20 @@ export interface StudentCreateRequest {
   admissionDate: string;
   emergencyContactPhone: string;
 }
+
+export interface StudentUpdateRequest {
+  careerId?: number;
+  currentSemester?: number;
+  totalCredits?: number;
+  totalDebt?: number;
+  emergencyContactPhone?: string;
+  academicStatus?: 'ACTIVO' | 'INACTIVO' | 'GRADUADO' | 'RETIRADO';
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}

@@ -1,0 +1,146 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+// Header
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .close-btn {
+    color: white;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+// Content
+.dialog-content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+// Form Grid
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+// Section Title
+.section-title {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 8px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 500;
+
+  mat-icon {
+    color: #667eea;
+  }
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+// Step Actions
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// Stepper Custom Styles
+::ng-deep {
+  .mat-stepper-horizontal {
+    background: transparent;
+  }
+
+  .mat-step-header {
+    padding: 16px 24px;
+
+    &.mat-step-header-selected {
+      .mat-step-label {
+        color: #667eea;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .mat-step-icon {
+    background: #667eea !important;
+  }
+
+  .mat-step-icon-selected {
+    background: #764ba2 !important;
+  }
+}
+
+// Dialog Actions
+mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f5f7fa;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// Loading Spinner in Button
+button mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}

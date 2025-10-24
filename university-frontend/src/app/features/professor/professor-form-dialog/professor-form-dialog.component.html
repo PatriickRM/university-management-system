@@ -1,0 +1,353 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ mode === 'create' ? 'person_add' : mode === 'edit' ? 'edit' : 'visibility' }}</mat-icon>
+      {{ dialogTitle }}
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <mat-dialog-content class="dialog-content">
+    @if (mode === 'create') {
+    <mat-stepper [linear]="true" #stepper>
+      
+      <!-- Step 1: Información Personal -->
+      <mat-step [stepControl]="userInfoForm" label="Información Personal">
+        <form [formGroup]="userInfoForm" class="form-grid">
+          <h3 class="section-title">
+            <mat-icon>account_circle</mat-icon>
+            Datos Personales
+          </h3>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombres</mat-label>
+            <input matInput formControlName="firstName" placeholder="Ej: Juan Carlos">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('firstName')?.hasError('required')) {
+                El nombre es requerido
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Apellidos</mat-label>
+            <input matInput formControlName="lastName" placeholder="Ej: Pérez García">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('lastName')?.hasError('required')) {
+                El apellido es requerido
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>DNI</mat-label>
+            <input matInput formControlName="nationalId" placeholder="12345678" maxlength="8">
+            <mat-icon matPrefix>badge</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('nationalId')?.hasError('required')) {
+                El DNI es requerido
+              }
+              @if (userInfoForm.get('nationalId')?.hasError('minlength')) {
+                Debe tener al menos 8 dígitos
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Género</mat-label>
+            <mat-select formControlName="gender">
+              @for (gender of genderOptions; track gender.value) {
+                <mat-option [value]="gender.value">
+                  {{ gender.label }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>wc</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('gender')?.hasError('required')) {
+                Selecciona un género
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput [matDatepicker]="birthDatePicker" formControlName="dateOfBirth">
+            <mat-datepicker-toggle matSuffix [for]="birthDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #birthDatePicker></mat-datepicker>
+            <mat-icon matPrefix>cake</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('dateOfBirth')?.hasError('required')) {
+                La fecha de nacimiento es requerida
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="phoneNumber" placeholder="987654321" maxlength="9">
+            <mat-icon matPrefix>phone</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('phoneNumber')?.hasError('required')) {
+                El teléfono es requerido
+              }
+              @if (userInfoForm.get('phoneNumber')?.hasError('pattern')) {
+                Debe tener 9 dígitos
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Dirección</mat-label>
+            <textarea matInput formControlName="address" rows="2" placeholder="Av. Principal 123, Lima"></textarea>
+            <mat-icon matPrefix>home</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('address')?.hasError('required')) {
+                La dirección es requerida
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <h3 class="section-title full-width">
+            <mat-icon>lock</mat-icon>
+            Credenciales de Acceso
+          </h3>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="profesor@universidad.edu">
+            <mat-icon matPrefix>email</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('email')?.hasError('required')) {
+                El email es requerido
+              }
+              @if (userInfoForm.get('email')?.hasError('email')) {
+                Email inválido
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre de Usuario</mat-label>
+            <input matInput formControlName="username" placeholder="Mínimo 4 caracteres">
+            <mat-icon matPrefix>account_circle</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('username')?.hasError('required')) {
+                El usuario es requerido
+              }
+              @if (userInfoForm.get('username')?.hasError('minlength')) {
+                Mínimo 4 caracteres
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Mínimo 8 caracteres">
+            <mat-icon matPrefix>vpn_key</mat-icon>
+            <mat-error>
+              @if (userInfoForm.get('password')?.hasError('required')) {
+                La contraseña es requerida
+              }
+              @if (userInfoForm.get('password')?.hasError('minlength')) {
+                Mínimo 8 caracteres
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <div class="step-actions full-width">
+            <button mat-button (click)="close()">Cancelar</button>
+            <button mat-raised-button color="primary" matStepperNext>
+              Siguiente
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 2: Información Laboral -->
+      <mat-step [stepControl]="professorInfoForm" label="Información Laboral">
+        <form [formGroup]="professorInfoForm" class="form-grid">
+          <h3 class="section-title">
+            <mat-icon>work</mat-icon>
+            Datos Laborales
+          </h3>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Código de Empleado</mat-label>
+            <input matInput formControlName="employeeCode" placeholder="PROF202400001">
+            <mat-icon matPrefix>qr_code</mat-icon>
+            <mat-error>
+              @if (professorInfoForm.get('employeeCode')?.hasError('required')) {
+                El código es requerido
+              }
+              @if (professorInfoForm.get('employeeCode')?.hasError('minlength')) {
+                Mínimo 6 caracteres
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Departamento</mat-label>
+            <mat-select formControlName="departmentId">
+              @for (dept of departments; track dept.id) {
+                <mat-option [value]="dept.id">
+                  {{ dept.departmentName }} ({{ dept.departmentCode }})
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>business</mat-icon>
+            <mat-error>
+              @if (professorInfoForm.get('departmentId')?.hasError('required')) {
+                Selecciona un departamento
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo de Contrato</mat-label>
+            <mat-select formControlName="employmentType">
+              @for (type of employmentTypeOptions; track type.value) {
+                <mat-option [value]="type.value">
+                  {{ type.label }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>work_outline</mat-icon>
+            <mat-error>
+              @if (professorInfoForm.get('employmentType')?.hasError('required')) {
+                Selecciona el tipo de contrato
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Contratación</mat-label>
+            <input matInput [matDatepicker]="hireDatePicker" formControlName="hireDate">
+            <mat-datepicker-toggle matSuffix [for]="hireDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #hireDatePicker></mat-datepicker>
+            <mat-icon matPrefix>event</mat-icon>
+            <mat-error>
+              @if (professorInfoForm.get('hireDate')?.hasError('required')) {
+                La fecha de contratación es requerida
+              }
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Ubicación de Oficina</mat-label>
+            <input matInput formControlName="officeLocation" placeholder="Edificio A - Piso 3 - Oficina 301">
+            <mat-icon matPrefix>room</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Especialización</mat-label>
+            <textarea matInput formControlName="specialization" rows="2" placeholder="Área de especialización o investigación"></textarea>
+            <mat-icon matPrefix>psychology</mat-icon>
+          </mat-form-field>
+
+          <div class="step-actions full-width">
+            <button mat-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              Atrás
+            </button>
+            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading">
+              @if (loading) {
+                <mat-spinner diameter="20"></mat-spinner>
+              }
+              @if (!loading) {
+                <span>Crear Profesor</span>
+              }
+            </button>
+          </div>
+        </form>
+      </mat-step>
+    </mat-stepper>
+    }
+
+    <!-- Formulario simple para editar/ver -->
+    @if (mode === 'edit' || mode === 'view') {
+    <form [formGroup]="professorInfoForm" class="form-grid">
+      <h3 class="section-title">
+        <mat-icon>work</mat-icon>
+        Información Laboral
+      </h3>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Código de Empleado</mat-label>
+        <input matInput formControlName="employeeCode">
+        <mat-icon matPrefix>qr_code</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Departamento</mat-label>
+        <mat-select formControlName="departmentId">
+          @for (dept of departments; track dept.id) {
+            <mat-option [value]="dept.id">
+              {{ dept.departmentName }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>business</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de Contrato</mat-label>
+        <mat-select formControlName="employmentType">
+          @for (type of employmentTypeOptions; track type.value) {
+            <mat-option [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>work_outline</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de Contratación</mat-label>
+        <input matInput [matDatepicker]="hirePicker" formControlName="hireDate">
+        <mat-datepicker-toggle matSuffix [for]="hirePicker"></mat-datepicker-toggle>
+        <mat-datepicker #hirePicker></mat-datepicker>
+        <mat-icon matPrefix>event</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Ubicación de Oficina</mat-label>
+        <input matInput formControlName="officeLocation">
+        <mat-icon matPrefix>room</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Especialización</mat-label>
+        <textarea matInput formControlName="specialization" rows="2"></textarea>
+        <mat-icon matPrefix>psychology</mat-icon>
+      </mat-form-field>
+    </form>
+    }
+  </mat-dialog-content>
+
+  <!-- Footer Actions (para edit/view) -->
+  @if (mode === 'edit' || mode === 'view') {
+  <mat-dialog-actions>
+    <button mat-button (click)="close()">
+      {{ mode === 'view' ? 'Cerrar' : 'Cancelar' }}
+    </button>
+    @if (mode === 'edit') {
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading">
+      @if (loading) {
+        <mat-spinner diameter="20"></mat-spinner>
+      }
+      @if (!loading) {
+        <span>Guardar Cambios</span>
+      }
+    </button>
+    }
+  </mat-dialog-actions>
+  }
+</div>

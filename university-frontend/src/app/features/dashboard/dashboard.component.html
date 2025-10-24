@@ -1,14 +1,15 @@
 <div class="dashboard-container">
-  <!-- Bienvenida -->
+  <!-- Welcome Section -->
   <div class="welcome-section">
     @if (currentUser$ | async; as user) {
-      <div class="welcome-card">
+      <div class="welcome-card" [attr.data-role]="userRole">
         <div class="user-avatar">
           <mat-icon>account_circle</mat-icon>
         </div>
         <div class="welcome-text">
-          <h1>¡Bienvenido, {{ user.firstName }}!</h1>
-          <p>{{ user.email }}</p>
+          <h1>{{ dashboardTitle }}</h1>
+          <h2>¡Bienvenido, {{ user.firstName }} {{ user.lastName }}!</h2>
+          <p>{{ dashboardSubtitle }}</p>
           <div class="user-roles">
             @for (role of user.roles; track role.id) {
               <span class="role-chip">{{ role.name }}</span>
@@ -19,7 +20,27 @@
     }
   </div>
 
-  <!-- Dashboard carta -->
+  <!-- Statistics Section -->
+  @if (stats.length > 0) {
+    <div class="stats-section">
+      @for (stat of stats; track stat.label) {
+        <div class="stat-card">
+          <div class="stat-icon" [style.background-color]="stat.color">
+            <mat-icon>{{ stat.icon }}</mat-icon>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">{{ stat.label }}</p>
+            <h3 class="stat-value">{{ stat.value }}</h3>
+            @if (stat.trend) {
+              <span class="stat-trend" [style.color]="stat.color">{{ stat.trend }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Dashboard Cards -->
   <div class="cards-grid">
     @for (card of cards; track card.title) {
       <mat-card class="dashboard-card" [routerLink]="card.route">
@@ -40,7 +61,7 @@
     }
   </div>
 
-  <!-- Acciones rapidas -->
+  <!-- Quick Actions -->
   <div class="quick-actions">
     <h2>Acciones Rápidas</h2>
     <div class="actions-grid">

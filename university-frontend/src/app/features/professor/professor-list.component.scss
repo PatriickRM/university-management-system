@@ -1,0 +1,259 @@
+.professor-list-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Page Header
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .header-content {
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 8px 0;
+      font-size: 2rem;
+      color: #2c3e50;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        color: #ee0979;
+      }
+    }
+
+    p {
+      margin: 0;
+      color: #7f8c8d;
+      font-size: 1rem;
+    }
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 48px;
+    padding: 0 24px;
+    font-size: 1rem;
+  }
+}
+
+// Filters Card
+.filters-card {
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .filters-content {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px;
+
+    .search-field {
+      flex: 1;
+      max-width: 500px;
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+  }
+}
+
+// Table Card
+.table-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .table-container {
+    overflow-x: auto;
+  }
+}
+
+// Table Styles
+table {
+  width: 100%;
+
+  th {
+    background: #f5f7fa;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  td {
+    color: #34495e;
+    font-size: 0.9375rem;
+  }
+
+  .table-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+// Professor Info
+.professor-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .professor-name {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  .professor-id {
+    font-size: 0.8125rem;
+    color: #7f8c8d;
+  }
+}
+
+// Department Info
+.department-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    color: #2c3e50;
+  }
+
+  small {
+    color: #7f8c8d;
+    font-size: 0.8125rem;
+  }
+}
+
+// Actions Menu
+.delete-action {
+  color: #e74c3c !important;
+}
+
+// Empty State
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #7f8c8d;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+    color: #bdc3c7;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    color: #2c3e50;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+}
+
+// Loading
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+// Paginator
+mat-paginator {
+  background: #f5f7fa;
+  border-top: 1px solid #e0e0e0;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .professor-list-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    .header-content h1 {
+      font-size: 1.5rem;
+    }
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .filters-content {
+    flex-direction: column;
+
+    .search-field {
+      max-width: 100%;
+    }
+
+    .filter-actions {
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+
+  // Ocultar columnas en móvil
+  table {
+    .mat-column-email,
+    .mat-column-department,
+    .mat-column-specialization {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    .mat-column-employmentType {
+      display: none;
+    }
+  }
+}

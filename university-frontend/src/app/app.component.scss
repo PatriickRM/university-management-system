@@ -1,59 +1,271 @@
+.sidenav {
+  .mat-mdc-list-item {
+    color: white !important;
+    
+    .mdc-list-item__primary-text {
+      color: white !important;
+    }
+    
+    .mat-icon {
+      color: rgba(255, 255, 255, 0.75) !important;
+    }
+    
+    &.active-link {
+      .mat-icon {
+        color: #667eea !important;
+      }
+    }
+  }
+  
+  span[matListItemTitle] {
+    color: white !important;
+  }
+}
 .sidenav-container {
   height: 100vh;
+  background: #f8f9fa;
 }
 
 .sidenav {
-  width: 260px;
-  background: #2c3e50;
+  width: 280px;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
   color: white;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
 
+  // Header del sidenav
   .sidenav-header {
-    padding: 24px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    padding: 24px 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-    .logo-icon {
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
-    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
 
-    h2 {
-      margin: 0;
-      font-size: 1.5rem;
-      font-weight: 600;
+      .logo-icon {
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .logo-text {
+        flex: 1;
+
+        h2 {
+          margin: 0;
+          font-size: 1.6rem;
+          font-weight: 700;
+          letter-spacing: 1px;
+        }
+
+        p {
+          margin: 2px 0 0 0;
+          font-size: 0.75rem;
+          opacity: 0.9;
+          font-weight: 500;
+        }
+      }
     }
   }
 
-  mat-nav-list {
-    padding-top: 16px;
+  // Lista del menú
+  .menu-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 0;
 
-    a {
-      color: rgba(255, 255, 255, 0.8);
-      margin: 4px 8px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
+    // Scrollbar personalizado
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    // Separador de sección
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px 10px;
+      margin-top: 16px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: -1px;
+        width: 50px;
+        height: 1px;
+        background: linear-gradient(90deg, #667eea, transparent);
+      }
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      span {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      &:first-child {
+        margin-top: 0;
+        border-top: none;
+
+        &::before {
+          display: none;
+        }
+      }
+    }
+
+    // Items del menú
+    a {
+      color: rgba(255, 255, 255, 0.85);
+      margin: 3px 12px;
+      border-radius: 10px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 12px 16px;
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #667eea;
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
         color: white;
+        transform: translateX(4px);
+
+        mat-icon {
+          transform: scale(1.1);
+        }
       }
 
       &.active-link {
-        background: rgba(102, 126, 234, 0.3);
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.25), rgba(102, 126, 234, 0.1));
         color: white;
-        font-weight: 500;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+
+        &::before {
+          transform: scaleY(1);
+        }
 
         mat-icon {
           color: #667eea;
+          filter: drop-shadow(0 0 6px rgba(102, 126, 234, 0.6));
         }
       }
 
       mat-icon {
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.75);
+        transition: all 0.3s ease;
+      }
+
+      span {
+        font-size: 0.9rem;
+        letter-spacing: 0.3px;
+      }
+    }
+  }
+
+  // Footer del sidenav
+  .sidenav-footer {
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .user-avatar-small {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        color: white;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .user-details {
+        flex: 1;
+        min-width: 0;
+
+        .user-name-small {
+          margin: 0;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: white;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .user-role-small {
+          margin: 2px 0 0 0;
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.7);
+          font-weight: 500;
+        }
       }
     }
   }
@@ -63,11 +275,25 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background: white !important;
+  color: #1a1a2e !important;
+
+  .menu-button {
+    color: #3f51b5;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(63, 81, 181, 0.1);
+      transform: rotate(90deg);
+    }
+  }
 
   .toolbar-title {
     font-size: 1.25rem;
-    font-weight: 500;
+    font-weight: 600;
+    color: #1a1a2e;
+    letter-spacing: 0.3px;
   }
 
   .spacer {
@@ -77,77 +303,130 @@
   .user-button {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 16px;
+    gap: 10px;
+    padding: 6px 16px;
+    border-radius: 24px;
+    transition: all 0.3s ease;
+    color: #1a1a2e;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
 
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: white;
-      color: #3f51b5;
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
     }
 
     .user-name {
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+
+    mat-icon {
+      color: #64748b;
     }
   }
 }
 
-.user-menu-header {
-  padding: 16px;
-  background: #f5f5f5;
+// ========================================
+// USER MENU
+// ========================================
+.user-menu {
+  .user-menu-header {
+    padding: 24px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    text-align: center;
 
-  .user-email {
-    margin: 0 0 8px 0;
-    font-size: 0.875rem;
-    color: #666;
-  }
-
-  .user-roles {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-
-    .role-chip {
-      background: #3f51b5;
+    .user-avatar-large {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 24px;
       color: white;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-full-name {
+      margin: 0 0 4px 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .user-email {
+      margin: 0 0 12px 0;
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+
+    .user-roles {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+
+      .role-chip {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+        &.admin {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        &.professor {
+          background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+        }
+
+        &.student {
+          background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+      }
+    }
+  }
+
+  button {
+    min-height: 48px;
+    font-size: 0.95rem;
+
+    mat-icon {
+      margin-right: 12px;
+    }
+
+    &.logout-button {
+      color: #dc3545;
+      font-weight: 600;
+
+      &:hover {
+        background: rgba(220, 53, 69, 0.08);
+      }
     }
   }
 }
 
+// ========================================
+// CONTENT
+// ========================================
 .content {
   min-height: calc(100vh - 64px);
-  background: #f5f7fa;
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .sidenav {
-    width: 220px;
-  }
-
-  .toolbar {
-    .user-name {
-      display: none;
-    }
-  }
-
-  .user-button {
-    min-width: auto !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .toolbar-title {
-    display: none;
-  }
+  background: #f8f9fa;
 }

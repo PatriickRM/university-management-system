@@ -1,0 +1,291 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ mode === 'create' ? 'person_add' : mode === 'edit' ? 'edit' : 'visibility' }}</mat-icon>
+      {{ dialogTitle }}
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <mat-dialog-content class="dialog-content">
+    <mat-stepper [linear]="true" #stepper *ngIf="mode === 'create'">
+      
+      <!-- Step 1: Información Personal -->
+      <mat-step [stepControl]="userInfoForm" label="Información Personal">
+        <form [formGroup]="userInfoForm" class="form-grid">
+          <h3 class="section-title">
+            <mat-icon>account_circle</mat-icon>
+            Datos Personales
+          </h3>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombres</mat-label>
+            <input matInput formControlName="firstName" placeholder="Ej: Juan Carlos">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('firstName')?.hasError('required')">
+              El nombre es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Apellidos</mat-label>
+            <input matInput formControlName="lastName" placeholder="Ej: Pérez García">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('lastName')?.hasError('required')">
+              El apellido es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>DNI</mat-label>
+            <input matInput formControlName="nationalId" placeholder="12345678" maxlength="8">
+            <mat-icon matPrefix>badge</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('nationalId')?.hasError('required')">
+              El DNI es requerido
+            </mat-error>
+            <mat-error *ngIf="userInfoForm.get('nationalId')?.hasError('minlength')">
+              Debe tener al menos 8 dígitos
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Género</mat-label>
+            <mat-select formControlName="gender">
+              <mat-option *ngFor="let gender of genderOptions" [value]="gender.value">
+                {{ gender.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>wc</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('gender')?.hasError('required')">
+              Selecciona un género
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput [matDatepicker]="birthDatePicker" formControlName="dateOfBirth">
+            <mat-datepicker-toggle matSuffix [for]="birthDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #birthDatePicker></mat-datepicker>
+            <mat-icon matPrefix>cake</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('dateOfBirth')?.hasError('required')">
+              La fecha de nacimiento es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="phoneNumber" placeholder="987654321" maxlength="9">
+            <mat-icon matPrefix>phone</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('phoneNumber')?.hasError('required')">
+              El teléfono es requerido
+            </mat-error>
+            <mat-error *ngIf="userInfoForm.get('phoneNumber')?.hasError('pattern')">
+              Debe tener 9 dígitos
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Dirección</mat-label>
+            <textarea matInput formControlName="address" rows="2" placeholder="Av. Principal 123, Lima"></textarea>
+            <mat-icon matPrefix>home</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('address')?.hasError('required')">
+              La dirección es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <h3 class="section-title full-width">
+            <mat-icon>lock</mat-icon>
+            Credenciales de Acceso
+          </h3>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="estudiante@universidad.edu">
+            <mat-icon matPrefix>email</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('email')?.hasError('required')">
+              El email es requerido
+            </mat-error>
+            <mat-error *ngIf="userInfoForm.get('email')?.hasError('email')">
+              Email inválido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre de Usuario</mat-label>
+            <input matInput formControlName="username" placeholder="Mínimo 4 caracteres">
+            <mat-icon matPrefix>account_circle</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('username')?.hasError('required')">
+              El usuario es requerido
+            </mat-error>
+            <mat-error *ngIf="userInfoForm.get('username')?.hasError('minlength')">
+              Mínimo 4 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Mínimo 8 caracteres">
+            <mat-icon matPrefix>vpn_key</mat-icon>
+            <mat-error *ngIf="userInfoForm.get('password')?.hasError('required')">
+              La contraseña es requerida
+            </mat-error>
+            <mat-error *ngIf="userInfoForm.get('password')?.hasError('minlength')">
+              Mínimo 8 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <div class="step-actions full-width">
+            <button mat-button (click)="close()">Cancelar</button>
+            <button mat-raised-button color="primary" matStepperNext>
+              Siguiente
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 2: Información Académica -->
+      <mat-step [stepControl]="studentInfoForm" label="Información Académica">
+        <form [formGroup]="studentInfoForm" class="form-grid">
+          <h3 class="section-title">
+            <mat-icon>school</mat-icon>
+            Datos Académicos
+          </h3>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Código de Estudiante</mat-label>
+            <input matInput formControlName="studentCode" placeholder="EST202400001">
+            <mat-icon matPrefix>qr_code</mat-icon>
+            <mat-error *ngIf="studentInfoForm.get('studentCode')?.hasError('required')">
+              El código es requerido
+            </mat-error>
+            <mat-error *ngIf="studentInfoForm.get('studentCode')?.hasError('minlength')">
+              Mínimo 6 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Carrera</mat-label>
+            <mat-select formControlName="careerId">
+              <mat-option *ngFor="let career of careers" [value]="career.id">
+                {{ career.careerName }} ({{ career.careerCode }})
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>school</mat-icon>
+            <mat-error *ngIf="studentInfoForm.get('careerId')?.hasError('required')">
+              Selecciona una carrera
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Semestre Actual</mat-label>
+            <input matInput type="number" formControlName="currentSemester" min="1" max="12">
+            <mat-icon matPrefix>123</mat-icon>
+            <mat-error *ngIf="studentInfoForm.get('currentSemester')?.hasError('required')">
+              El semestre es requerido
+            </mat-error>
+            <mat-error *ngIf="studentInfoForm.get('currentSemester')?.hasError('min')">
+              Mínimo: 1
+            </mat-error>
+            <mat-error *ngIf="studentInfoForm.get('currentSemester')?.hasError('max')">
+              Máximo: 12
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Admisión</mat-label>
+            <input matInput [matDatepicker]="admissionDatePicker" formControlName="admissionDate">
+            <mat-datepicker-toggle matSuffix [for]="admissionDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #admissionDatePicker></mat-datepicker>
+            <mat-icon matPrefix>event</mat-icon>
+            <mat-error *ngIf="studentInfoForm.get('admissionDate')?.hasError('required')">
+              La fecha de admisión es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono de Emergencia</mat-label>
+            <input matInput formControlName="emergencyContactPhone" placeholder="987654321" maxlength="9">
+            <mat-icon matPrefix>emergency</mat-icon>
+            <mat-error *ngIf="studentInfoForm.get('emergencyContactPhone')?.hasError('required')">
+              El teléfono de emergencia es requerido
+            </mat-error>
+            <mat-error *ngIf="studentInfoForm.get('emergencyContactPhone')?.hasError('pattern')">
+              Debe tener 9 dígitos
+            </mat-error>
+          </mat-form-field>
+
+          <div class="step-actions full-width">
+            <button mat-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              Atrás
+            </button>
+            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading">
+              <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+              <span *ngIf="!loading">Crear Estudiante</span>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+    </mat-stepper>
+
+    <!-- Formulario simple para editar/ver -->
+    <form [formGroup]="studentInfoForm" class="form-grid" *ngIf="mode === 'edit' || mode === 'view'">
+      <h3 class="section-title">
+        <mat-icon>school</mat-icon>
+        Información Académica
+      </h3>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Código de Estudiante</mat-label>
+        <input matInput formControlName="studentCode">
+        <mat-icon matPrefix>qr_code</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Carrera</mat-label>
+        <mat-select formControlName="careerId">
+          <mat-option *ngFor="let career of careers" [value]="career.id">
+            {{ career.careerName }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>school</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Semestre Actual</mat-label>
+        <input matInput type="number" formControlName="currentSemester">
+        <mat-icon matPrefix>123</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de Admisión</mat-label>
+        <input matInput [matDatepicker]="admissionPicker" formControlName="admissionDate">
+        <mat-datepicker-toggle matSuffix [for]="admissionPicker"></mat-datepicker-toggle>
+        <mat-datepicker #admissionPicker></mat-datepicker>
+        <mat-icon matPrefix>event</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Teléfono de Emergencia</mat-label>
+        <input matInput formControlName="emergencyContactPhone">
+        <mat-icon matPrefix>emergency</mat-icon>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Footer Actions (para edit/view) -->
+  <mat-dialog-actions *ngIf="mode === 'edit' || mode === 'view'">
+    <button mat-button (click)="close()">
+      {{ mode === 'view' ? 'Cerrar' : 'Cancelar' }}
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" *ngIf="mode === 'edit'" [disabled]="loading">
+      <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+      <span *ngIf="!loading">Guardar Cambios</span>
+    </button>
+  </mat-dialog-actions>
+</div>

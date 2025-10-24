@@ -96,7 +96,6 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public void deleteStudent(Long id) {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new ErrorSistema("Estudiante de ID: " + id + " no encontrada"));
