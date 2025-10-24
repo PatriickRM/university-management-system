@@ -6,7 +6,6 @@ import com.university.domain.model.enums.DepartmentStatus;
 import com.university.web.dto.department.DepartmentCreateRequestDTO;
 import com.university.web.dto.department.DepartmentResponseDTO;
 import com.university.web.dto.department.DepartmentUpdateRequestDTO;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component

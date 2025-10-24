@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -45,6 +43,12 @@ services:
       # JWT
       JWT_SECRET: clave_megasegurisima_queno_habra_problema_en_poner_4222
       JWT_EXPIRATION: 86400000
+
+      # CORS (para Angular)
+      CORS_ALLOWED_ORIGINS: http://localhost:4200,http://localhost:80
+      CORS_ALLOWED_METHODS: GET,POST,PUT,DELETE,PATCH,OPTIONS
+      CORS_ALLOWED_HEADERS: "*"
+      CORS_ALLOW_CREDENTIALS: "true"
 
       # Profile
       SPRING_PROFILES_ACTIVE: docker
