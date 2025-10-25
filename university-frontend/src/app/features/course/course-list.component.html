@@ -1,0 +1,280 @@
+<div class="course-list-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon>book</mat-icon>
+        Catálogo de Cursos
+      </h1>
+      <p>Explora y gestiona los cursos disponibles</p>
+    </div>
+    @if (isAdmin) {
+      <button mat-raised-button color="primary" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Nuevo Curso
+      </button>
+    }
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <form [formGroup]="filterForm" class="filters-content">
+      <!-- Search -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar curso</mat-label>
+        <input matInput formControlName="search" placeholder="Código, nombre, descripción...">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <!-- Department Filter -->
+      <mat-form-field appearance="outline">
+        <mat-label>Departamento</mat-label>
+        <mat-select formControlName="departmentId">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (dept of departments; track dept.id) {
+            <mat-option [value]="dept.id">
+              {{ dept.departmentName }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>business</mat-icon>
+      </mat-form-field>
+
+      <!-- Credits Filter -->
+      <mat-form-field appearance="outline">
+        <mat-label>Créditos</mat-label>
+        <mat-select formControlName="credits">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (credit of creditOptions; track credit) {
+            <mat-option [value]="credit">{{ credit }} créditos</mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>grade</mat-icon>
+      </mat-form-field>
+
+      <!-- Status Filter -->
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="status">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (status of statusOptions; track status.value) {
+            <mat-option [value]="status.value">{{ status.label }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>info</mat-icon>
+      </mat-form-field>
+
+      <!-- Action Buttons -->
+      <div class="filter-actions">
+        <button mat-stroked-button type="button" (click)="clearFilters()">
+          <mat-icon>clear</mat-icon>
+          Limpiar
+        </button>
+        
+        <mat-button-toggle-group [value]="viewMode" (change)="toggleView($event.value)">
+          <mat-button-toggle value="grid" matTooltip="Vista de tarjetas">
+            <mat-icon>grid_view</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="table" matTooltip="Vista de tabla">
+            <mat-icon>table_rows</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </form>
+  </mat-card>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+  }
+
+  <!-- Grid View -->
+  @if (!loading && viewMode === 'grid') {
+    <div class="courses-grid">
+      @if (filteredCourses.length === 0) {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <h3>No se encontraron cursos</h3>
+          <p>Intenta ajustar los filtros de búsqueda</p>
+        </div>
+      }
+      
+      @for (course of filteredCourses; track course.id) {
+        <mat-card class="course-card" [style.border-top-color]="getDepartmentColor(course.department.departmentCode)">
+          <div class="course-header">
+            <div class="course-code">
+              <mat-icon>qr_code</mat-icon>
+              {{ course.courseCode }}
+            </div>
+            <mat-chip [color]="getStatusColor(course.status)" highlighted>
+              {{ course.status }}
+            </mat-chip>
+          </div>
+
+          <mat-card-content>
+            <h3 class="course-name">{{ course.courseName }}</h3>
+            
+            <p class="course-description">
+              {{ course.description || 'Sin descripción disponible' }}
+            </p>
+
+            <div class="course-info">
+              <div class="info-item">
+                <mat-icon>business</mat-icon>
+                <span>{{ course.department.departmentName }}</span>
+              </div>
+              
+              <div class="info-item">
+                <mat-icon>room</mat-icon>
+                <span>{{ course.department.location }}</span>
+              </div>
+
+              <div class="info-item credits">
+                <mat-icon>grade</mat-icon>
+                <span>{{ course.credits }} créditos</span>
+              </div>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="viewCourse(course)">
+              <mat-icon>visibility</mat-icon>
+              Ver Detalles
+            </button>
+            
+            @if (isAdmin) {
+              <button mat-icon-button [matMenuTriggerFor]="cardMenu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #cardMenu="matMenu">
+                <button mat-menu-item (click)="openEditDialog(course)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar</span>
+                </button>
+                <button mat-menu-item (click)="deleteCourse(course)" class="delete-action">
+                  <mat-icon color="warn">delete</mat-icon>
+                  <span>Eliminar</span>
+                </button>
+              </mat-menu>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+
+  <!-- Table View -->
+  @if (!loading && viewMode === 'table') {
+    <mat-card class="table-card">
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort>
+          
+          <!-- Course Code Column -->
+          <ng-container matColumnDef="courseCode">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
+            <td mat-cell *matCellDef="let course">
+              <strong>{{ course.courseCode }}</strong>
+            </td>
+          </ng-container>
+
+          <!-- Course Name Column -->
+          <ng-container matColumnDef="courseName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre del Curso</th>
+            <td mat-cell *matCellDef="let course">
+              <div class="course-name-cell">
+                <span class="name">{{ course.courseName }}</span>
+                @if (course.description) {
+                  <small class="description">{{ course.description }}</small>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Department Column -->
+          <ng-container matColumnDef="department">
+            <th mat-header-cell *matHeaderCellDef>Departamento</th>
+            <td mat-cell *matCellDef="let course">
+              <div class="department-cell">
+                <mat-chip [style.background-color]="getDepartmentColor(course.department.departmentCode)" class="department-chip">
+                  {{ course.department.departmentCode }}
+                </mat-chip>
+                <span>{{ course.department.departmentName }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Credits Column -->
+          <ng-container matColumnDef="credits">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Créditos</th>
+            <td mat-cell *matCellDef="let course">
+              <div class="credits-cell">
+                <mat-icon>{{ getCreditIcon(course.credits) }}</mat-icon>
+                <span>{{ course.credits }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+            <td mat-cell *matCellDef="let course">
+              <mat-chip [color]="getStatusColor(course.status)" highlighted>
+                {{ course.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let course">
+              <button mat-icon-button [matMenuTriggerFor]="tableMenu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #tableMenu="matMenu">
+                <button mat-menu-item (click)="viewCourse(course)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Ver Detalle</span>
+                </button>
+                @if (isAdmin) {
+                  <button mat-menu-item (click)="openEditDialog(course)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Editar</span>
+                  </button>
+                  <button mat-menu-item (click)="deleteCourse(course)" class="delete-action">
+                    <mat-icon color="warn">delete</mat-icon>
+                    <span>Eliminar</span>
+                  </button>
+                }
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="empty-state">
+                <mat-icon>book</mat-icon>
+                <h3>No se encontraron cursos</h3>
+                <p>Intenta ajustar los filtros de búsqueda</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Paginator -->
+      <mat-paginator
+        [length]="filteredCourses.length"
+        [pageSize]="12"
+        [pageSizeOptions]="[12, 24, 48]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card>
+  }
+</div>

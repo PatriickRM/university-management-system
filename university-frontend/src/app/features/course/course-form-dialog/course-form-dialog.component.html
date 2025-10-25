@@ -1,0 +1,260 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ mode === 'create' ? 'add_circle' : mode === 'edit' ? 'edit' : 'visibility' }}</mat-icon>
+      {{ dialogTitle }}
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <mat-dialog-content class="dialog-content">
+    @if (mode === 'view' && course) {
+      <!-- View Mode - Course Details -->
+      <div class="course-details">
+        <div class="detail-section">
+          <div class="detail-header">
+            <mat-icon>info</mat-icon>
+            <h3>Información del Curso</h3>
+          </div>
+
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Código del Curso</label>
+              <div class="value">
+                <mat-icon>qr_code</mat-icon>
+                <strong>{{ course.courseCode }}</strong>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <label>Nombre del Curso</label>
+              <div class="value">
+                <mat-icon>book</mat-icon>
+                <span>{{ course.courseName }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <label>Créditos</label>
+              <div class="value">
+                <mat-chip [class]="'credits-badge ' + getCreditBadgeClass(course.credits)">
+                  <mat-icon>grade</mat-icon>
+                  {{ course.credits }} créditos
+                </mat-chip>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <label>Estado</label>
+              <div class="value">
+                <mat-chip [color]="course.status === 'ACTIVO' ? 'primary' : 'warn'" highlighted>
+                  {{ course.status }}
+                </mat-chip>
+              </div>
+            </div>
+
+            <div class="detail-item full-width">
+              <label>Descripción</label>
+              <div class="value description">
+                <mat-icon>description</mat-icon>
+                <p>{{ course.description || 'Sin descripción disponible' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="detail-section">
+          <div class="detail-header">
+            <mat-icon>business</mat-icon>
+            <h3>Departamento</h3>
+          </div>
+
+          <div class="department-info">
+            <div class="dept-card">
+              <div class="dept-icon">
+                <mat-icon>domain</mat-icon>
+              </div>
+              <div class="dept-details">
+                <h4>{{ course.department.departmentName }}</h4>
+                <div class="dept-meta">
+                  <span class="code">{{ course.department.departmentCode }}</span>
+                  <span class="location">
+                    <mat-icon>room</mat-icon>
+                    {{ course.department.location }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (mode === 'create' || mode === 'edit') {
+      <!-- Edit/Create Mode - Form -->
+      <form [formGroup]="courseForm" class="course-form">
+        <div class="form-section">
+          <div class="section-header">
+            <mat-icon>book</mat-icon>
+            <h3>Información del Curso</h3>
+          </div>
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Código del Curso</mat-label>
+              <input matInput formControlName="courseCode" placeholder="Ej: CS101">
+              <mat-icon matPrefix>qr_code</mat-icon>
+              <mat-hint>Código único del curso</mat-hint>
+              <mat-error>
+                @if (courseForm.get('courseCode')?.hasError('required')) {
+                  El código es requerido
+                }
+                @if (courseForm.get('courseCode')?.hasError('minlength')) {
+                  Mínimo 3 caracteres
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Créditos</mat-label>
+              <mat-select formControlName="credits">
+                @for (credit of creditOptions; track credit) {
+                  <mat-option [value]="credit">{{ credit }} créditos</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>grade</mat-icon>
+              <mat-error>
+                @if (courseForm.get('credits')?.hasError('required')) {
+                  Los créditos son requeridos
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nombre del Curso</mat-label>
+              <input matInput formControlName="courseName" placeholder="Ej: Introducción a la Programación">
+              <mat-icon matPrefix>title</mat-icon>
+              <mat-error>
+                @if (courseForm.get('courseName')?.hasError('required')) {
+                  El nombre es requerido
+                }
+                @if (courseForm.get('courseName')?.hasError('minlength')) {
+                  Mínimo 3 caracteres
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Descripción</mat-label>
+              <textarea 
+                matInput 
+                formControlName="description" 
+                rows="4"
+                placeholder="Describe el contenido y objetivos del curso...">
+              </textarea>
+              <mat-icon matPrefix>description</mat-icon>
+              <mat-hint>Opcional - Proporciona una breve descripción del curso</mat-hint>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="form-section">
+          <div class="section-header">
+            <mat-icon>business</mat-icon>
+            <h3>Asignación</h3>
+          </div>
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Departamento</mat-label>
+              <mat-select formControlName="departmentId">
+                @for (dept of departments; track dept.id) {
+                  <mat-option [value]="dept.id">
+                    <div class="dept-option">
+                      <strong>{{ dept.departmentName }}</strong>
+                      <small>{{ dept.departmentCode }}</small>
+                    </div>
+                  </mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>domain</mat-icon>
+              <mat-error>
+                @if (courseForm.get('departmentId')?.hasError('required')) {
+                  Selecciona un departamento
+                }
+              </mat-error>
+            </mat-form-field>
+
+            @if (mode === 'edit') {
+              <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="status">
+                  @for (status of statusOptions; track status.value) {
+                    <mat-option [value]="status.value">{{ status.label }}</mat-option>
+                  }
+                </mat-select>
+                <mat-icon matPrefix>info</mat-icon>
+              </mat-form-field>
+            }
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="form-preview">
+          <div class="preview-header">
+            <mat-icon>visibility</mat-icon>
+            <h3>Vista Previa</h3>
+          </div>
+          <div class="preview-card">
+            <div class="preview-code">{{ courseForm.value.courseCode || 'CÓDIGO' }}</div>
+            <h4>{{ courseForm.value.courseName || 'Nombre del Curso' }}</h4>
+            <p>{{ courseForm.value.description || 'Sin descripción' }}</p>
+            <div class="preview-footer">
+              <mat-chip class="preview-credits">
+                <mat-icon>grade</mat-icon>
+                {{ courseForm.value.credits || 0 }} créditos
+              </mat-chip>
+              @if (courseForm.value.departmentId) {
+                <span class="preview-dept">
+                  {{ getDepartmentById(courseForm.value.departmentId)?.departmentName }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      </form>
+    }
+  </mat-dialog-content>
+
+  <!-- Footer Actions -->
+  <mat-dialog-actions>
+    <button mat-button (click)="close()">
+      {{ mode === 'view' ? 'Cerrar' : 'Cancelar' }}
+    </button>
+    @if (mode === 'create' || mode === 'edit') {
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onSubmit()" 
+        [disabled]="loading || courseForm.invalid">
+        @if (loading) {
+          <mat-spinner diameter="20"></mat-spinner>
+        }
+        @if (!loading) {
+        <ng-container>
+            <mat-icon>{{ mode === 'create' ? 'add' : 'save' }}</mat-icon>
+            <span>{{ mode === 'create' ? 'Crear Curso' : 'Guardar Cambios' }}</span>
+        </ng-container>
+        }
+      </button>
+    }
+  </mat-dialog-actions>
+</div>
