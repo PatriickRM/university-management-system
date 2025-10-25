@@ -63,6 +63,12 @@ export const routes: Routes = [
     path: 'unauthorized',
     loadComponent: () => import('./shared/components/unauthorized.component').then(m => m.UnauthorizedComponent)
   },
+  {
+    path: 'periods',
+    loadComponent: () => import('./features/academic-period/period-list.component').then(m => m.PeriodListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
   /*
   {
     path: 'enrollments',

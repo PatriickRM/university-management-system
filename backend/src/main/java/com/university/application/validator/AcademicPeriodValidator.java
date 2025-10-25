@@ -28,6 +28,10 @@ public class AcademicPeriodValidator {
         if (dto.getStartDate().isBefore(LocalDate.now())) {
             throw new ErrorSistema("La fecha de inicio no puede estar en pasado");
         }
+        long days = java.time.temporal.ChronoUnit.DAYS.between(dto.getStartDate(), dto.getEndDate());
+        if (days != 105) {
+            throw new ErrorSistema("El periodo académico debe durar exactamente 105 días (" + days + " encontrados)");
+        }
     }
 
     public void validateAcademicPeriodUpdate(AcademicPeriod academicPeriod, AcademicPeriodUpdateRequestDTO dto) {
@@ -37,6 +41,10 @@ public class AcademicPeriodValidator {
 
         if (endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
             throw new ErrorSistema("La fecha de fin debe ser despues de la fecha de inicio");
+        }
+        long days = java.time.temporal.ChronoUnit.DAYS.between(dto.getStartDate(), dto.getEndDate());
+        if (days != 105) {
+            throw new ErrorSistema("El periodo académico debe durar exactamente 105 días (" + days + " encontrados)");
         }
     }
 }

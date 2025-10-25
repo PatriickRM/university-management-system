@@ -230,7 +230,7 @@
           </div>
         }
 
-        @for (timeSlot of timeSlots; track timeSlot.id; let i = $index) {
+        @for (timeSlot of timeSlots; track i; let i = $index) {
           <mat-card class="timeslot-card">
             <div class="timeslot-header">
               <h4>Sesión {{ i + 1 }}</h4>
