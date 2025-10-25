@@ -3,7 +3,9 @@ package com.university.application.mapper.impl;
 import com.university.application.mapper.AcademicPeriodMapper;
 import com.university.application.mapper.CourseMapper;
 import com.university.application.mapper.CourseOfferingMapper;
+import com.university.application.mapper.TimeSlotMapper;
 import com.university.domain.model.CourseOffering;
+import com.university.domain.model.Professor;
 import com.university.domain.model.enums.OfferingStatus;
 import com.university.web.dto.courseoffering.CourseOfferingCreateRequestDTO;
 import com.university.web.dto.courseoffering.CourseOfferingResponseDTO;
@@ -12,11 +14,14 @@ import com.university.web.dto.professor.ProfessorBasicDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class CourseOfferingMapperImpl implements CourseOfferingMapper {
     private final CourseMapper courseMapper;
     private final AcademicPeriodMapper academicPeriodMapper;
+    private final TimeSlotMapper timeSlotMapper;
 
     @Override
     public CourseOffering toEntity(CourseOfferingCreateRequestDTO dto) {
@@ -26,6 +31,7 @@ public class CourseOfferingMapperImpl implements CourseOfferingMapper {
                 .maxStudents(dto.getMaxStudents())
                 .currentEnrollment(0)
                 .status(OfferingStatus.ABIERTO)
+                .durationWeeks(dto.getDurationWeeks() != null ? dto.getDurationWeeks() : 15)
                 .build();
     }
 
@@ -50,13 +56,17 @@ public class CourseOfferingMapperImpl implements CourseOfferingMapper {
                 .currentEnrollment(courseOffering.getCurrentEnrollment())
                 .availableSeats(availableSeats)
                 .status(courseOffering.getStatus())
+                .durationWeeks(courseOffering.getDurationWeeks())
+                .totalWeeklyHours(courseOffering.getTotalWeeklyHours())
                 .course(courseMapper.toResponseDto(courseOffering.getCourse()))
                 .academicPeriod(academicPeriodMapper.toResponseDTO(courseOffering.getAcademicPeriod()))
                 .professor(toProfessorBasicDTO(courseOffering.getProfessor()))
+                .timeSlots(courseOffering.getTimeSlots().stream()
+                        .map(timeSlotMapper::toResponseDTO).collect(Collectors.toList()))
                 .build();
     }
 
-    private ProfessorBasicDTO toProfessorBasicDTO(com.university.domain.model.Professor professor) {
+    private ProfessorBasicDTO toProfessorBasicDTO(Professor professor) {
         if (professor == null) return null;
 
         String fullName = professor.getUser().getFirstName() + " " + professor.getUser().getLastName();

@@ -27,5 +27,13 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     @Query("SELECT COUNT(e) FROM Enrollment e WHERE e.student.id = :studentId AND e.status IN ('ENROLLED', 'IN_PROGRESS')")
     Long countActiveEnrollmentsByStudent(@Param("studentId") Long studentId);
 
+    //Contar créditos totales de un estudiante en un período
+    @Query("SELECT COALESCE(SUM(e.courseOffering.course.credits), 0) FROM Enrollment e " +
+            "WHERE e.student.id = :studentId " +
+            "AND e.courseOffering.academicPeriod.id = :periodId " +
+            "AND e.status IN ('MATRICULADO', 'EN_CURSO')")
+    Long countCreditsByStudentAndPeriod(@Param("studentId") Long studentId, @Param("periodId") Long periodId);
+
+
     boolean existsByStudentIdAndCourseOfferingId(Long studentId, Long courseOfferingId);
 }

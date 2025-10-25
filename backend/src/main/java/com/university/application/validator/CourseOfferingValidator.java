@@ -16,6 +16,7 @@ public class CourseOfferingValidator {
     private final CourseRepository courseRepository;
     private final AcademicPeriodRepository academicPeriodRepository;
     private final ProfessorRepository professorRepository;
+    private final TimeSlotValidator timeSlotValidator;
 
     public void validateCourseOfferingCreation(CourseOfferingCreateRequestDTO dto) {
         // Validar que el curso exista
@@ -38,6 +39,14 @@ public class CourseOfferingValidator {
                 .ifPresent(offering -> {
                     throw new ErrorSistema("Oferta de curso ya existente en el mismo periodo");
                 });
+
+        //Validar franjas horarias
+        if (dto.getTimeSlots() == null || dto.getTimeSlots().isEmpty()) {
+            throw new ErrorSistema("Debe incluir al menos una franja horaria");
+        }
+
+        //Validar cada franja horaria individualmente
+        dto.getTimeSlots().forEach(timeSlotValidator::validateTimeSlotCreation);
     }
 
     public void validateCourseOfferingUpdate(CourseOffering courseOffering, CourseOfferingUpdateRequestDTO dto) {

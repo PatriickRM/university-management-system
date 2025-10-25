@@ -2,17 +2,13 @@ package com.university.application.service.impl;
 
 import com.university.application.exception.ErrorSistema;
 import com.university.application.mapper.CourseOfferingMapper;
+import com.university.application.mapper.TimeSlotMapper;
 import com.university.application.service.CourseOfferingService;
 import com.university.application.validator.CourseOfferingValidator;
-import com.university.domain.model.AcademicPeriod;
-import com.university.domain.model.Course;
-import com.university.domain.model.CourseOffering;
-import com.university.domain.model.Professor;
+import com.university.application.validator.TimeSlotValidator;
+import com.university.domain.model.*;
 import com.university.domain.model.enums.OfferingStatus;
-import com.university.domain.repository.AcademicPeriodRepository;
-import com.university.domain.repository.CourseOfferingRepository;
-import com.university.domain.repository.CourseRepository;
-import com.university.domain.repository.ProfessorRepository;
+import com.university.domain.repository.*;
 import com.university.web.dto.courseoffering.CourseOfferingCreateRequestDTO;
 import com.university.web.dto.courseoffering.CourseOfferingResponseDTO;
 import com.university.web.dto.courseoffering.CourseOfferingUpdateRequestDTO;
@@ -29,13 +25,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class CourseOfferingServiceImpl implements CourseOfferingService {
-
     private final CourseOfferingRepository courseOfferingRepository;
     private final CourseRepository courseRepository;
     private final AcademicPeriodRepository academicPeriodRepository;
     private final ProfessorRepository professorRepository;
     private final CourseOfferingMapper courseOfferingMapper;
     private final CourseOfferingValidator courseOfferingValidator;
+    private final TimeSlotValidator timeSlotValidator;
+    private final TimeSlotMapper timeSlotMapper;
+    private final TimeSlotRepository timeSlotRepository;
 
     @Override
     public CourseOfferingResponseDTO createCourseOffering(CourseOfferingCreateRequestDTO dto) {
@@ -58,7 +56,28 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
                 .orElseThrow(() -> new ErrorSistema("Profesor con ID no encontrado: " + dto.getProfessorId()));
         courseOffering.setProfessor(professor);
 
+        //Crear TimeSlots
+        List<TimeSlot> timeSlots = dto.getTimeSlots().stream()
+                .map(timeSlotMapper::toEntity)
+                .toList();
+
+        // Validar horas semanales y conflictos
+        timeSlotValidator.validateTotalWeeklyHours(courseOffering, dto.getTimeSlots());
+        timeSlotValidator.validateNoConflictsForProfessor(courseOffering, dto.getTimeSlots());
+        timeSlotValidator.validateNoConflictsForClassroom(courseOffering, dto.getTimeSlots());
+
+        // Guardar la oferta primero
         CourseOffering savedOffering = courseOfferingRepository.save(courseOffering);
+        //Variable para usar en lambda
+        final CourseOffering finalSavedOffering = savedOffering;
+
+        // Asignar la oferta a cada TimeSlot y guardar
+        timeSlots.forEach(ts -> {
+            ts.setCourseOffering(finalSavedOffering);
+            timeSlotRepository.save(ts);
+        });
+        // Recargar para obtener los timeSlots
+        savedOffering = courseOfferingRepository.findById(savedOffering.getId()).orElseThrow();
 
         return courseOfferingMapper.toResponseDTO(savedOffering);
     }

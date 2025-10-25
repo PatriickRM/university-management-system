@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class CourseOffering {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_course_offering")
@@ -42,6 +42,21 @@ public class CourseOffering {
     @Enumerated(EnumType.STRING)
     private OfferingStatus status;
 
-    @OneToMany(mappedBy = "courseOffering")
-    private List<Enrollment> enrollments;
+    @Column(name = "duration_weeks")
+    private Integer durationWeeks = 15; // 15 semanas
+
+    @OneToMany(mappedBy = "courseOffering", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Enrollment> enrollments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "courseOffering", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<TimeSlot> timeSlots = new ArrayList<>();
+
+    //Calcular total de horas semanales
+    public Double getTotalWeeklyHours() {
+        return timeSlots.stream()
+                .mapToDouble(TimeSlot::getDurationHours)
+                .sum();
+    }
 }

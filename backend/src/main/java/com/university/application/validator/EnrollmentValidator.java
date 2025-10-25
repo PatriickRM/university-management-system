@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class EnrollmentValidator {
-
     private final EnrollmentRepository enrollmentRepository;
     private final StudentRepository studentRepository;
     private final CourseOfferingRepository courseOfferingRepository;
+    private final TimeSlotValidator timeSlotValidator;
 
     public void validateEnrollmentCreation(EnrollmentCreateRequestDTO dto) {
         // Validar que el estudiante exista
@@ -38,7 +38,7 @@ public class EnrollmentValidator {
 
         // Validar que haya cupos disponibles
         if (offering.getCurrentEnrollment() >= offering.getMaxStudents()) {
-            throw new ErrorSistema("Curso ofrecido esta lleno , no quedan cupos disponibles.");
+            throw new ErrorSistema("Curso ofrecido esta lleno, no quedan cupos disponibles.");
         }
 
         // Validar que el estudiante no esté ya matriculado en esta oferta
@@ -46,12 +46,27 @@ public class EnrollmentValidator {
             throw new ErrorSistema("Estudiante ya esta matriculado en este curso");
         }
 
+        //Validar créditos máximos por período (24 créditos)
+        Long currentCredits = enrollmentRepository.countCreditsByStudentAndPeriod(dto.getStudentId(), offering.getAcademicPeriod().getId());
+        if (currentCredits == null) currentCredits = 0L;
+        if (currentCredits + offering.getCourse().getCredits() > 24) {
+            throw new ErrorSistema(String.format("No puedes matricularte en más de 24 créditos por período. Actualmente tienes %d créditos", currentCredits));
+        }
+
+        //Validar conflictos de horario para el estudiante
+        if (offering.getTimeSlots() != null && !offering.getTimeSlots().isEmpty()) {
+            timeSlotValidator.validateNoConflictsForStudent(
+                    dto.getStudentId(),
+                    offering.getAcademicPeriod().getId(),
+                    offering.getTimeSlots()
+            );
+        }
     }
 
     public void validateEnrollmentUpdate(Enrollment enrollment, EnrollmentUpdateRequestDTO dto) {
         // Validar que si se asigna calificación, el curso debe estar completado
         if (dto.getFinalGrade() != null && enrollment.getStatus() != EnrollmentStatus.COMPLETADO) {
-            throw new ErrorSistema("Asignar calificacion si curso esta compleado");
+            throw new ErrorSistema("Asignar calificacion si curso esta completado");
         }
     }
 }
