@@ -5,8 +5,6 @@ import { environment } from '../../../environments/environment';
 import { Course } from '../models/course.model';
 import { CourseCreateRequest,PageResponse,CourseUpdateRequest } from '../models/course.model';
 
-
-
 @Injectable({
   providedIn: 'root'
 })

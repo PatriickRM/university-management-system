@@ -67,4 +67,9 @@ export class StudentService {
   getStudentsWithDebt(): Observable<Student[]> {
     return this.http.get<Student[]>(`${this.apiUrl}/with-debt`);
   }
+
+  getByUserId(userId: number): Observable<Student> {
+    return this.http.get<Student>(`${environment.apiUrl}/students/by-user/${userId}`);
+  }
+
 }

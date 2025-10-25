@@ -1,7 +1,11 @@
 package com.university.web.controller;
 
+import com.university.application.exception.ErrorSistema;
+import com.university.application.mapper.StudentMapper;
 import com.university.application.service.StudentService;
+import com.university.domain.model.Student;
 import com.university.domain.model.enums.StudentStatus;
+import com.university.domain.repository.StudentRepository;
 import com.university.web.dto.student.StudentCreateRequestDTO;
 import com.university.web.dto.student.StudentResponseDTO;
 import com.university.web.dto.student.StudentUpdateRequestDTO;
@@ -24,6 +28,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StudentController {
     private final StudentService studentService;
+    private final StudentRepository studentRepository;
+    private final StudentMapper studentMapper;
 
     //Crear estudiante
     @PostMapping
@@ -135,4 +141,13 @@ public class StudentController {
         studentService.deleteStudent(id);
         return ResponseEntity.ok(Map.of("mensaje", "Estudiante puesto en inactivo correctamente"));
     }
+
+    @GetMapping("/by-user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurityService.isOwner(#userId)")
+    public ResponseEntity<StudentResponseDTO> getByUserId(@PathVariable Long userId) {
+        Student s = studentRepository.findByUserId(userId)
+                .orElseThrow(() -> new ErrorSistema("No existe Student para userId " + userId));
+        return ResponseEntity.ok(studentMapper.toResponseDTO(s));
+    }
+
 }

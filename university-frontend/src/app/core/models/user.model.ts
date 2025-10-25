@@ -30,4 +30,5 @@ export interface LoginResponse {
   email: string;
   username: string;
   roles: Role[];
+  student?: { id: number; studentCode: string };
 }

@@ -53,7 +53,6 @@ export interface CourseCreateRequest {
   description?: string;
   credits: number;
   departmentId: number;
-  timeSlots?: TimeSlotCreateRequest[];
 }
 
 export interface CourseUpdateRequest {

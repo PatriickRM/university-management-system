@@ -50,6 +50,7 @@ export class AppComponent {
     { icon: 'school', label: 'Gestión de Estudiantes', route: '/students', roles: ['ADMIN'] },
     { icon: 'person', label: 'Gestión de Profesores', route: '/professors', roles: ['ADMIN'] },
     { icon: 'book', label: 'Gestión de Cursos', route: '/courses', roles: ['ADMIN'] },
+    { icon: 'class', label: 'Ofertas de Cursos', route: '/offerings', roles: ['ADMIN', 'STUDENT'] },
     { icon: 'assignment', label: 'Control de Matrículas', route: '/enrollments', roles: ['ADMIN'] },
     { icon: 'calendar_today', label: 'Períodos Académicos', route: '/periods', roles: ['ADMIN'] },
     { icon: 'business', label: 'Departamentos', route: '/departments', roles: ['ADMIN'] },
@@ -64,7 +65,7 @@ export class AppComponent {
     
     //STUDENT
     { icon: 'assignment', label: 'Mis Matrículas', route: '/enrollments/my-enrollments', roles: ['STUDENT'] },
-    { icon: 'search', label: 'Cursos Disponibles', route: '/courses/available', roles: ['STUDENT'] },
+    { icon: 'class', label: 'Ofertas de Cursos', route: '/offerings', roles: ['STUDENT'] },
     { icon: 'grade', label: 'Mis Calificaciones', route: '/grades', roles: ['STUDENT'] },
     { icon: 'schedule', label: 'Mi Horario', route: '/schedule', roles: ['STUDENT'] },
     { icon: 'account_balance_wallet', label: 'Estado de Cuenta', route: '/payments', roles: ['STUDENT'] },

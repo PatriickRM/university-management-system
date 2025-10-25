@@ -69,6 +69,12 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
+  {
+    path: 'offerings',
+    loadComponent: () => import('./features/course-offering/offering-list.component').then(m => m.OfferingListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'STUDENT'] }
+  },
   /*
   {
     path: 'enrollments',

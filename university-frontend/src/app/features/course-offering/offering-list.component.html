@@ -1,0 +1,132 @@
+<div class="offering-container">
+      <div class="page-header">
+        <div class="header-content">
+          <h1>
+            <mat-icon>class</mat-icon>
+            Ofertas de Cursos
+          </h1>
+          <p>Cursos disponibles por período académico</p>
+        </div>
+        @if (isAdmin) {
+          <button mat-raised-button color="primary" (click)="openCreateDialog()">
+            <mat-icon>add</mat-icon>
+            Nueva Oferta
+          </button>
+        }
+      </div>
+
+      <!-- Period Filter -->
+      <mat-card class="filter-card">
+        <mat-form-field appearance="outline">
+          <mat-label>Filtrar por Período</mat-label>
+          <mat-select [formControl]="periodFilter">
+            <mat-option [value]="null">Todos los períodos</mat-option>
+            @for (period of periods; track period.id) {
+              <mat-option [value]="period.id">
+                {{ period.periodCode }} - {{ period.status }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>calendar_today</mat-icon>
+        </mat-form-field>
+      </mat-card>
+
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      } @else {
+        <div class="offerings-grid">
+          @for (offering of filteredOfferings; track offering.id) {
+            <mat-card class="offering-card" [class.full]="offering.availableSeats === 0">
+              <div class="offering-header">
+                <div class="course-code">{{ offering.course.courseCode }}</div>
+                <mat-chip [color]="getStatusColor(offering.status)" highlighted>
+                  {{ offering.status }}
+                </mat-chip>
+              </div>
+
+              <mat-card-content>
+                <h3>{{ offering.course.courseName }}</h3>
+                
+                <div class="offering-info">
+                  <div class="info-row">
+                    <mat-icon>person</mat-icon>
+                    <span>{{ offering.professor.fullName }}</span>
+                  </div>
+                  <div class="info-row">
+                    <mat-icon>calendar_today</mat-icon>
+                    <span>{{ offering.academicPeriod.periodCode }}</span>
+                  </div>
+                  <div class="info-row">
+                    <mat-icon>schedule</mat-icon>
+                    <span>{{ offering.totalWeeklyHours }}h semanales</span>
+                  </div>
+                  <div class="info-row">
+                    <mat-icon>grade</mat-icon>
+                    <span>{{ offering.course.credits }} créditos</span>
+                  </div>
+                </div>
+
+                <div class="enrollment-info">
+                  <div class="seats">
+                    <strong>{{ offering.currentEnrollment }}</strong> / {{ offering.maxStudents }}
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress" [style.width.%]="getEnrollmentPercentage(offering)"></div>
+                  </div>
+                  <small>{{ offering.availableSeats }} cupos disponibles</small>
+                </div>
+
+                <!-- Time Slots -->
+                <div class="schedule">
+                  <h4>
+                    <mat-icon>schedule</mat-icon>
+                    Horario
+                  </h4>
+                  @for (slot of offering.timeSlots; track slot.id) {
+                    <div class="time-slot">
+                      <mat-icon>today</mat-icon>
+                      <span><strong>{{ slot.dayOfWeek }}</strong>: {{ slot.startTime }} - {{ slot.endTime }}</span>
+                      <mat-chip>{{ slot.classroom }}</mat-chip>
+                    </div>
+                  }
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions>
+                @if (isAdmin) {
+                  <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="editOffering(offering)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Editar</span>
+                    </button>
+                    <button mat-menu-item (click)="deleteOffering(offering)">
+                      <mat-icon color="warn">delete</mat-icon>
+                      <span>Eliminar</span>
+                    </button>
+                  </mat-menu>
+                }
+                @if (isStudent && offering.availableSeats > 0 && offering.status === 'ABIERTO') {
+                  <button mat-raised-button color="primary" (click)="enrollInOffering(offering)">
+                    <mat-icon>assignment</mat-icon>
+                    Matricularme
+                  </button>
+                }
+              </mat-card-actions>
+            </mat-card>
+          }
+
+          @if (filteredOfferings.length === 0) {
+            <div class="empty-state">
+              <mat-icon>search_off</mat-icon>
+              <h3>No hay ofertas disponibles</h3>
+              <p>No se encontraron ofertas para el período seleccionado</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
