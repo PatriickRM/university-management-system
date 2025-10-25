@@ -1,0 +1,74 @@
+<div class="schedule-container">
+      <div class="page-header">
+        <h1>
+          <mat-icon>calendar_view_week</mat-icon>
+          Mi Horario
+        </h1>
+        <p>Visualiza tu horario semanal</p>
+      </div>
+
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      } @else {
+        <div class="schedule-grid">
+          @for (day of daysOfWeek; track day) {
+            <mat-card class="day-card">
+              <div class="day-header">
+                <mat-icon>today</mat-icon>
+                <h3>{{ getDayLabel(day) }}</h3>
+              </div>
+
+              <div class="day-slots">
+                @for (schedule of getScheduleForDay(day); track schedule.courseOfferingId) {
+                  <div class="time-slot-item">
+                    <div class="slot-time">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ getTimeSlotForDay(schedule, day) }}</span>
+                    </div>
+                    <div class="slot-info">
+                      <strong>{{ schedule.courseCode }}</strong>
+                      <p>{{ schedule.courseName }}</p>
+                      <small>{{ schedule.professorName }}</small>
+                      <div class="slot-details">
+                        <mat-chip>{{ getClassroomForDay(schedule, day) }}</mat-chip>
+                        <mat-chip color="primary">{{ schedule.credits }} créditos</mat-chip>
+                      </div>
+                    </div>
+                  </div>
+                } @empty {
+                  <div class="empty-day">
+                    <mat-icon>event_busy</mat-icon>
+                    <p>Sin clases</p>
+                  </div>
+                }
+              </div>
+            </mat-card>
+          }
+        </div>
+
+        <div class="summary-card">
+          <mat-card>
+            <h3>
+              <mat-icon>summarize</mat-icon>
+              Resumen Semanal
+            </h3>
+            <div class="summary-content">
+              <div class="summary-item">
+                <mat-icon>school</mat-icon>
+                <span>Total de cursos: <strong>{{ schedules.length }}</strong></span>
+              </div>
+              <div class="summary-item">
+                <mat-icon>timer</mat-icon>
+                <span>Horas semanales: <strong>{{ getTotalWeeklyHours() }}</strong></span>
+              </div>
+              <div class="summary-item">
+                <mat-icon>grade</mat-icon>
+                <span>Total créditos: <strong>{{ getTotalCredits() }}</strong></span>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+      }
+    </div>

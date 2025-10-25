@@ -3,30 +3,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Course } from '../models/course.model';
+import { CourseCreateRequest,PageResponse,CourseUpdateRequest } from '../models/course.model';
 
-export interface CourseCreateRequest {
-  courseCode: string;
-  courseName: string;
-  description?: string;
-  credits: number;
-  departmentId: number;
-}
 
-export interface CourseUpdateRequest {
-  courseName?: string;
-  description?: string;
-  credits?: number;
-  departmentId?: number;
-  status?: 'ACTIVO' | 'INACTIVO';
-}
-
-export interface PageResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
 
 @Injectable({
   providedIn: 'root'

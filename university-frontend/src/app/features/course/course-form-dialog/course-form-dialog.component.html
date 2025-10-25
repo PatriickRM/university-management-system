@@ -204,6 +204,95 @@
                 <mat-icon matPrefix>info</mat-icon>
               </mat-form-field>
             }
+            @if (mode === 'create' || mode === 'edit') {
+  <mat-divider></mat-divider>
+
+  <div class="form-section">
+    <div class="section-header">
+      <mat-icon>schedule</mat-icon>
+      <h3>Horarios de Clase</h3>
+    </div>
+
+    <div class="timeslots-container">
+      <div class="timeslots-header">
+        <p>Define las franjas horarias para este curso (Total: 6 horas semanales)</p>
+        <button mat-raised-button color="accent" type="button" (click)="addTimeSlot()" 
+                [disabled]="timeSlots.length >= 4">
+          <mat-icon>add</mat-icon>
+          Agregar Horario
+        </button>
+      </div>
+
+        @if (timeSlots.length === 0) {
+          <div class="empty-timeslots">
+            <mat-icon>schedule</mat-icon>
+            <p>No hay horarios definidos. Agrega al menos 2 franjas horarias.</p>
+          </div>
+        }
+
+        @for (timeSlot of timeSlots; track timeSlot.id; let i = $index) {
+          <mat-card class="timeslot-card">
+            <div class="timeslot-header">
+              <h4>Sesión {{ i + 1 }}</h4>
+              <button mat-icon-button color="warn" type="button" (click)="removeTimeSlot(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+
+            <div class="timeslot-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Día de la Semana</mat-label>
+                <mat-select [(ngModel)]="timeSlot.dayOfWeek" name="day_{{i}}" [ngModelOptions]="{standalone: true}" required>
+                  @for (day of daysOfWeek; track day.value) {
+                    <mat-option [value]="day.value">{{ day.label }}</mat-option>
+                  }
+                </mat-select>
+                <mat-icon matPrefix>calendar_today</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Hora de Inicio</mat-label>
+                <input matInput type="time" [(ngModel)]="timeSlot.startTime" 
+                      name="start_{{i}}" [ngModelOptions]="{standalone: true}" required min="07:00" max="22:00">
+                <mat-icon matPrefix>access_time</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Hora de Fin</mat-label>
+                <input matInput type="time" [(ngModel)]="timeSlot.endTime" 
+                      name="end_{{i}}" [ngModelOptions]="{standalone: true}" required min="07:00" max="22:00">
+                <mat-icon matPrefix>access_time</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Aula</mat-label>
+                <input matInput [(ngModel)]="timeSlot.classroom" 
+                      name="classroom_{{i}}" placeholder="Ej: A-301" [ngModelOptions]="{standalone: true}" required>
+                <mat-icon matPrefix>meeting_room</mat-icon>
+              </mat-form-field>
+            </div>
+
+            @if (timeSlot.startTime && timeSlot.endTime) {
+              <div class="timeslot-duration">
+                <mat-icon>schedule</mat-icon>
+                <span>Duración: {{ calculateDuration(timeSlot.startTime, timeSlot.endTime) }} horas</span>
+              </div>
+            }
+          </mat-card>
+        }
+
+        @if (timeSlots.length > 0) {
+          <div class="total-hours">
+            <mat-icon>timer</mat-icon>
+            <strong>Total Semanal: {{ calculateTotalHours() }} horas</strong>
+            @if (calculateTotalHours() !== 6) {
+              <span class="warning">(Debe ser exactamente 6 horas)</span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
           </div>
         </div>
 

@@ -60,13 +60,13 @@ export class AppComponent {
     { icon: 'groups', label: 'Mis Estudiantes', route: '/students/my-students', roles: ['PROFESSOR'] },
     { icon: 'grading', label: 'Registrar Calificaciones', route: '/grades/manage', roles: ['PROFESSOR'] },
     { icon: 'checklist', label: 'Control de Asistencia', route: '/attendance', roles: ['PROFESSOR'] },
-    { icon: 'schedule', label: 'Mi Horario', route: '/schedule/professor', roles: ['PROFESSOR'] },
+    { icon: 'schedule', label: 'Mi Horario', route: '/schedule', roles: ['PROFESSOR'] },
     
     //STUDENT
     { icon: 'assignment', label: 'Mis Matrículas', route: '/enrollments/my-enrollments', roles: ['STUDENT'] },
     { icon: 'search', label: 'Cursos Disponibles', route: '/courses/available', roles: ['STUDENT'] },
     { icon: 'grade', label: 'Mis Calificaciones', route: '/grades', roles: ['STUDENT'] },
-    { icon: 'schedule', label: 'Mi Horario', route: '/schedule/student', roles: ['STUDENT'] },
+    { icon: 'schedule', label: 'Mi Horario', route: '/schedule', roles: ['STUDENT'] },
     { icon: 'account_balance_wallet', label: 'Estado de Cuenta', route: '/payments', roles: ['STUDENT'] },
   ];
 

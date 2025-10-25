@@ -53,16 +53,23 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['PROFESSOR'] }
   },
+  {
+    path: 'schedule',
+    loadComponent: () => import('./features/schedule/schedule-view.component').then(m => m.ScheduleViewComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['STUDENT', 'PROFESSOR'] }
+  },
+  {
+    path: 'unauthorized',
+    loadComponent: () => import('./shared/components/unauthorized.component').then(m => m.UnauthorizedComponent)
+  },
   /*
   {
     path: 'enrollments',
     loadComponent: () => import('./features/enrollments/enrollment-list/enrollment-list.component').then(m => m.EnrollmentListComponent),
     canActivate: [authGuard]
   },
-  {
-    path: 'unauthorized',
-    loadComponent: () => import('./shared/components/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent)
-  },*/
+  */
   {
     path: '**',
     redirectTo: '/dashboard'

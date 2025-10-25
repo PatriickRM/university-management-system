@@ -1,0 +1,222 @@
+.schedule-container {
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      background: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+
+      h1 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 8px 0;
+        font-size: 2rem;
+        color: #2c3e50;
+
+        mat-icon {
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+          color: #667eea;
+        }
+      }
+
+      p {
+        margin: 0;
+        color: #7f8c8d;
+        font-size: 1rem;
+      }
+    }
+
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .day-card {
+      border-top: 4px solid #667eea;
+
+      .day-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        margin: -16px -16px 16px -16px;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+
+        h3 {
+          margin: 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+      }
+
+      .day-slots {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 100px;
+      }
+
+      .time-slot-item {
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #e9ecef;
+          transform: translateX(4px);
+        }
+
+        .slot-time {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 8px;
+          color: #64748b;
+          font-size: 0.875rem;
+
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        .slot-info {
+          strong {
+            display: block;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+          }
+
+          p {
+            margin: 0 0 4px 0;
+            color: #64748b;
+            font-size: 0.875rem;
+          }
+
+          small {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.8125rem;
+            margin-bottom: 8px;
+          }
+
+          .slot-details {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+
+            mat-chip {
+              font-size: 0.75rem;
+              min-height: 24px;
+            }
+          }
+        }
+      }
+
+      .empty-day {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        color: #cbd5e0;
+
+        mat-icon {
+          font-size: 48px;
+          width: 48px;
+          height: 48px;
+          margin-bottom: 8px;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.875rem;
+        }
+      }
+    }
+
+    .summary-card {
+      mat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+
+        h3 {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin: 0 0 16px 0;
+          font-size: 1.2rem;
+
+          mat-icon {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+          }
+        }
+
+        .summary-content {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+
+          .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+
+            mat-icon {
+              font-size: 32px;
+              width: 32px;
+              height: 32px;
+            }
+
+            span {
+              font-size: 0.95rem;
+
+              strong {
+                font-size: 1.2rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      .schedule-grid {
+        grid-template-columns: 1fr;
+      }
+      .summary-content {
+        grid-template-columns: 1fr !important;
+      }
+    }

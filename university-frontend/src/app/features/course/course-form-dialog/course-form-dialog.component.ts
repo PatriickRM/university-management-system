@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -8,15 +8,24 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Course } from '../../../core/models/course.model';
 import { Department } from '../../../core/models/professor.model';
 import { DepartmentService } from '../../../core/services/department.service';
 import { CourseService } from '../../../core/services/course.service';
+import { DayOfWeek } from '../../../core/models/timeslot.model';
 
+interface TimeSlotForm {
+  id?: number;
+  dayOfWeek: DayOfWeek | null;
+  startTime: string;
+  endTime: string;
+  classroom: string;
+}
 
 @Component({
   selector: 'app-course-form-dialog',
@@ -24,6 +33,7 @@ import { CourseService } from '../../../core/services/course.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -32,7 +42,8 @@ import { CourseService } from '../../../core/services/course.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatChipsModule,
-    MatDividerModule
+    MatDividerModule,
+    MatCardModule
   ],
   templateUrl: './course-form-dialog.component.html',
   styleUrls: ['./course-form-dialog.component.scss']
@@ -48,6 +59,17 @@ export class CourseFormDialogComponent implements OnInit {
   loading = false;
   mode: 'create' | 'edit' | 'view' = 'create';
   course?: Course;
+
+  // NUEVO: TimeSlots
+  timeSlots: TimeSlotForm[] = [];
+  daysOfWeek = [
+    { value: DayOfWeek.LUNES, label: 'Lunes' },
+    { value: DayOfWeek.MARTES, label: 'Martes' },
+    { value: DayOfWeek.MIERCOLES, label: 'Miércoles' },
+    { value: DayOfWeek.JUEVES, label: 'Jueves' },
+    { value: DayOfWeek.VIERNES, label: 'Viernes' },
+    { value: DayOfWeek.SABADO, label: 'Sábado' }
+  ];
 
   creditOptions = [1, 2, 3, 4, 5, 6];
   statusOptions = [
@@ -115,6 +137,73 @@ export class CourseFormDialogComponent implements OnInit {
     });
   }
 
+
+  addTimeSlot(): void {
+    if (this.timeSlots.length >= 4) {
+      this.snackBar.open('Máximo 4 horarios por curso', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    this.timeSlots.push({
+      dayOfWeek: null,
+      startTime: '08:00',
+      endTime: '11:00',
+      classroom: ''
+    });
+  }
+
+  removeTimeSlot(index: number): void {
+    this.timeSlots.splice(index, 1);
+  }
+
+  calculateDuration(startTime: string, endTime: string): number {
+    if (!startTime || !endTime) return 0;
+
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+
+    const startMinutes = startHour * 60 + startMin;
+    const endMinutes = endHour * 60 + endMin;
+
+    return (endMinutes - startMinutes) / 60;
+  }
+
+  calculateTotalHours(): number {
+    return this.timeSlots.reduce((total, slot) => {
+      return total + this.calculateDuration(slot.startTime, slot.endTime);
+    }, 0);
+  }
+
+  validateTimeSlots(): boolean {
+    if (this.mode !== 'create') return true;
+
+    if (this.timeSlots.length < 2) {
+      this.snackBar.open('Se requieren al menos 2 horarios', 'Cerrar', { duration: 3000 });
+      return false;
+    }
+
+    if (this.timeSlots.length > 4) {
+      this.snackBar.open('Máximo 4 horarios por curso', 'Cerrar', { duration: 3000 });
+      return false;
+    }
+
+    const totalHours = this.calculateTotalHours();
+    if (Math.abs(totalHours - 6) > 0.01) {
+      this.snackBar.open('El total de horas debe ser exactamente 6', 'Cerrar', { duration: 3000 });
+      return false;
+    }
+
+    //Validar que todos los campos estén llenos
+    for (let slot of this.timeSlots) {
+      if (!slot.dayOfWeek || !slot.startTime || !slot.endTime || !slot.classroom) {
+        this.snackBar.open('Completa todos los campos de horarios', 'Cerrar', { duration: 3000 });
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   onSubmit(): void {
     if (this.courseForm.invalid) {
       this.courseForm.markAllAsTouched();
@@ -125,8 +214,20 @@ export class CourseFormDialogComponent implements OnInit {
       return;
     }
 
+    if (this.mode === 'create' && !this.validateTimeSlots()) {
+      return;
+    }
+
     this.loading = true;
-    const courseData = this.courseForm.value;
+    const courseData = {
+      ...this.courseForm.value,
+      timeSlots: this.mode === 'create' ? this.timeSlots.map(slot => ({
+        dayOfWeek: slot.dayOfWeek,
+        startTime: slot.startTime + ':00',
+        endTime: slot.endTime + ':00',
+        classroom: slot.classroom
+      })) : undefined
+    };
 
     if (this.mode === 'edit' && this.course) {
       this.courseService.updateCourse(this.course.id, courseData).subscribe({
