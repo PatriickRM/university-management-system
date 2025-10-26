@@ -1,0 +1,111 @@
+.dialog-container {
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #ff9800 0%, #ff6f00 100%);
+      color: white;
+
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        font-size: 1.5rem;
+
+        mat-icon {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+        }
+      }
+
+      button {
+        color: white;
+      }
+    }
+
+    mat-dialog-content {
+      padding: 24px;
+    }
+
+    .enrollment-info {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        label {
+          font-weight: 600;
+          color: #64748b;
+        }
+
+        span {
+          color: #2c3e50;
+        }
+      }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      mat-form-field {
+        width: 100%;
+      }
+    }
+
+    .grade-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px;
+      background: #f44336;
+      color: white;
+      border-radius: 12px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      transition: all 0.3s ease;
+
+      &.approved {
+        background: #4caf50;
+      }
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    mat-dialog-actions {
+      padding: 16px 24px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }

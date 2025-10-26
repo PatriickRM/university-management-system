@@ -147,18 +147,35 @@ export class OfferingListComponent implements OnInit {
   }
 
   openCreateDialog(): void {
-    // Implementar diálogo de creación
-    this.snackBar.open('Función de creación próximamente', 'Cerrar', {
-      duration: 3000
+    import('./offering-form-dialog/offering-form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.OfferingFormDialogComponent, {
+        width: '800px',
+        maxHeight: '90vh',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) this.loadOfferings();
+      });
     });
   }
 
   editOffering(offering: CourseOffering): void {
-    // Implementar diálogo de edición
-    this.snackBar.open('Función de edición próximamente', 'Cerrar', {
-      duration: 3000
+    import('./offering-form-dialog/offering-form-dialog.component').then(m => {
+        const dialogRef = this.dialog.open(m.OfferingFormDialogComponent, {
+        width: '800px',
+        maxHeight: '90vh',
+        disableClose: true,
+        data: { offering }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+        if (result) this.loadOfferings(); 
+        });
     });
   }
+
+
 
   deleteOffering(offering: CourseOffering): void {
     if (confirm(`¿Eliminar la oferta de ${offering.course.courseName}?`)) {

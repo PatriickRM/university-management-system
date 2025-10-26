@@ -1,0 +1,45 @@
+@use '../../../shared/styles/form-dialog';
+
+.time-slots-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 0;
+}
+
+.time-slot-form {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border-left: 4px solid #e91e63;
+  position: relative;
+
+  h4 {
+    margin: 0 0 16px 0;
+    color: #2c3e50;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  button[mat-icon-button] {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .slot-grid {
+    grid-template-columns: 1fr;
+  }
+}

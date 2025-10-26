@@ -1,0 +1,144 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+        <mat-icon>{{ data?.offering ? 'edit' : 'add_circle' }}</mat-icon>
+        {{ data?.offering ? 'Editar Oferta de Curso' : 'Nueva Oferta de Curso' }}
+    </h2>
+
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <mat-stepper [linear]="true" #stepper>
+      
+      <mat-step [stepControl]="basicInfoForm" label="Información Básica">
+        <form [formGroup]="basicInfoForm" class="form-grid">
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Curso</mat-label>
+            <mat-select formControlName="courseId">
+              @for (course of courses; track course.id) {
+                <mat-option [value]="course.id">
+                  {{ course.courseCode }} - {{ course.courseName }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>book</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Período Académico</mat-label>
+            <mat-select formControlName="academicPeriodId">
+              @for (period of periods; track period.id) {
+                <mat-option [value]="period.id">
+                  {{ period.periodCode }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>calendar_today</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Profesor</mat-label>
+            <mat-select formControlName="professorId">
+              @for (professor of professors; track professor.id) {
+                <mat-option [value]="professor.id">
+                  {{ professor.user.firstName }} {{ professor.user.lastName }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>person</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Máximo de Estudiantes</mat-label>
+            <input matInput type="number" formControlName="maxStudents">
+            <mat-icon matPrefix>groups</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Duración (semanas)</mat-label>
+            <input matInput type="number" formControlName="durationWeeks">
+            <mat-icon matPrefix>schedule</mat-icon>
+          </mat-form-field>
+
+          <div class="step-actions full-width">
+            <button mat-button (click)="close()">Cancelar</button>
+            <button mat-raised-button color="primary" matStepperNext>
+              Siguiente
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step [stepControl]="scheduleForm" label="Horario">
+        <form [formGroup]="scheduleForm">
+          <div class="time-slots-container">
+            @for (slot of timeSlotGroups; track $index; let i = $index) {
+              <div [formGroup]="slot" class="time-slot-form">
+                <h4>Horario {{ i + 1 }}</h4>
+                
+                <div class="slot-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Día</mat-label>
+                    <mat-select formControlName="dayOfWeek">
+                      @for (day of daysOfWeek; track day.value) {
+                        <mat-option [value]="day.value">{{ day.label }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Hora Inicio</mat-label>
+                    <input matInput type="time" formControlName="startTime">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Hora Fin</mat-label>
+                    <input matInput type="time" formControlName="endTime">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Aula</mat-label>
+                    <input matInput formControlName="classroom" placeholder="A-101">
+                  </mat-form-field>
+                </div>
+
+                @if (timeSlots.length > 1) {
+                  <button mat-icon-button color="warn" (click)="removeTimeSlot(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
+              </div>
+            }
+
+            @if (timeSlots.length < 4) {
+              <button mat-stroked-button (click)="addTimeSlot()">
+                <mat-icon>add</mat-icon>
+                Agregar Horario
+              </button>
+            }
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              Atrás
+            </button>
+            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading">
+              @if (loading) {
+                <mat-spinner diameter="20"></mat-spinner>
+              }
+              @if (!loading) {
+                <span>{{ data?.offering ? 'Actualizar Oferta' : 'Crear Oferta' }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      </mat-step>
+    </mat-stepper>
+  </mat-dialog-content>
+</div>

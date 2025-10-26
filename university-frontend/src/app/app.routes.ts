@@ -75,13 +75,18 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'STUDENT'] }
   },
-  /*
   {
     path: 'enrollments',
-    loadComponent: () => import('./features/enrollments/enrollment-list/enrollment-list.component').then(m => m.EnrollmentListComponent),
-    canActivate: [authGuard]
+    loadComponent: () => import('./features/enrollment/enrollment-list.component').then(m => m.EnrollmentListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
   },
-  */
+  {
+    path: 'enrollments/my-enrollments',
+    loadComponent: () => import('./features/enrollment/enrollment-list.component').then(m => m.EnrollmentListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['STUDENT'] }
+  },
   {
     path: '**',
     redirectTo: '/dashboard'

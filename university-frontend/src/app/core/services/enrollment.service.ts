@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Enrollment, EnrollmentCreateRequest } from '../models/enrollment.model';
+import { Enrollment, EnrollmentCreateRequest, EnrollmentUpdateRequest } from '../models/enrollment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +13,9 @@ export class EnrollmentService {
 
   createEnrollment(request: EnrollmentCreateRequest): Observable<Enrollment> {
     return this.http.post<Enrollment>(this.apiUrl, request);
+  }
+  getAllEnrollments(): Observable<Enrollment[]> {
+    return this.http.get<Enrollment[]>(this.apiUrl);
   }
 
   getEnrollmentsByStudent(studentId: number): Observable<Enrollment[]> {
@@ -27,14 +30,13 @@ export class EnrollmentService {
     return this.http.patch<Enrollment>(`${this.apiUrl}/${id}/withdraw`, {});
   }
 
-  updateEnrollment(id: number, request: any): Observable<Enrollment> {
+  updateEnrollment(id: number, request: EnrollmentUpdateRequest): Observable<Enrollment> {
     return this.http.put<Enrollment>(`${this.apiUrl}/${id}`, request);
   }
 
-  deleteEnrollment(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  deleteEnrollment(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-
   completeEnrollment(id: number): Observable<Enrollment> {
     return this.http.patch<Enrollment>(`${this.apiUrl}/${id}/complete`, {});
   }

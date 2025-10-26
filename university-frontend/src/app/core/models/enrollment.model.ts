@@ -27,3 +27,8 @@ export interface EnrollmentCreateRequest {
   studentId: number;
   courseOfferingId: number;
 }
+
+export interface EnrollmentUpdateRequest {
+  status?: 'MATRICULADO' | 'EN_CURSO' | 'COMPLETADO' | 'RETIRADO' | 'APROBADO' | 'REPROBADO';
+  finalGrade?: number;
+}
