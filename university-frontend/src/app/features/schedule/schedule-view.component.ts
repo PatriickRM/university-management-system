@@ -12,6 +12,9 @@ import { FormsModule } from '@angular/forms';
 import { TimeSlotService } from '../../core/services/timeslot.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Schedule, DayOfWeek } from '../../core/models/timeslot.model';
+import { StudentService } from '../../core/services/student.service';
+import { ProfessorService } from '../../core/services/professor.service';
+import { AcademicPeriodService } from '../../core/services/academic-period.service';
 
 @Component({
   selector: 'app-schedule-view',
@@ -32,6 +35,9 @@ import { Schedule, DayOfWeek } from '../../core/models/timeslot.model';
 export class ScheduleViewComponent implements OnInit {
   private timeSlotService = inject(TimeSlotService);
   private authService = inject(AuthService);
+  private studentService = inject(StudentService);      
+  private professorService = inject(ProfessorService);  
+  private periodService = inject(AcademicPeriodService);
 
   schedules: Schedule[] = [];
   loading = false;
@@ -58,17 +64,75 @@ export class ScheduleViewComponent implements OnInit {
       return;
     }
 
-    // Por ahora usamos período 1 fijo (deberías obtener el período activo)
-    const periodId = 1;
-
     if (this.authService.hasRole('STUDENT')) {
-      // Cargar horario de estudiante (necesitarás obtener el studentId del user)
-      // this.timeSlotService.getStudentSchedule(studentId, periodId).subscribe({...});
-      this.loading = false;
+      const userId = this.authService.getUserIdFromToken();
+      if (!userId) {
+        this.loading = false;
+        return;
+      }
+
+      // Obtener el estudiante y período activo
+      this.studentService.getByUserId(userId).subscribe({
+        next: (student) => {
+          this.periodService.getActivePeriod().subscribe({
+            next: (period) => {
+              // Ahora sí cargar el horario
+              this.timeSlotService.getStudentSchedule(student.id, period.id).subscribe({
+                next: (schedules) => {
+                  this.schedules = schedules;
+                  this.loading = false;
+                },
+                error: (err) => {
+                  console.error(err);
+                  this.loading = false;
+                }
+              });
+            },
+            error: (err) => {
+              console.error('Error loading period:', err);
+              this.loading = false;
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error loading student:', err);
+          this.loading = false;
+        }
+      });
     } else if (this.authService.hasRole('PROFESSOR')) {
-      // Cargar horario de profesor (necesitarás obtener el professorId del user)
-      // this.timeSlotService.getProfessorSchedule(professorId, periodId).subscribe({...});
-      this.loading = false;
+      const userId = this.authService.getUserIdFromToken();
+      if (!userId) {
+        this.loading = false;
+        return;
+      }
+
+      // Obtener el profesor y período activo
+      this.professorService.getProfessorByUserId(userId).subscribe({
+        next: (professor) => {
+          this.periodService.getActivePeriod().subscribe({
+            next: (period) => {
+              this.timeSlotService.getProfessorSchedule(professor.id, period.id).subscribe({
+                next: (schedules) => {
+                  this.schedules = schedules;
+                  this.loading = false;
+                },
+                error: (err) => {
+                  console.error(err);
+                  this.loading = false;
+                }
+              });
+            },
+            error: (err) => {
+              console.error('Error loading period:', err);
+              this.loading = false;
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error loading professor:', err);
+          this.loading = false;
+        }
+      });
     } else {
       this.loading = false;
     }

@@ -30,7 +30,15 @@
           <mat-icon matPrefix>calendar_today</mat-icon>
         </mat-form-field>
       </mat-card>
-
+      <mat-card class="info-card" *ngIf="isStudent">
+        <div class="period-info">
+          <mat-icon>calendar_today</mat-icon>
+          <div>
+            <strong>Período de Matrícula:</strong>
+            <span>{{ activePeriod?.periodCode }}</span>
+          </div>
+        </div>
+      </mat-card>
       @if (loading) {
         <div class="loading-container">
           <mat-spinner></mat-spinner>

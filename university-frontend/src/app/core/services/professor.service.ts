@@ -27,6 +27,10 @@ export class ProfessorService {
     return this.http.get<PageResponse<Professor>>(`${this.apiUrl}/paginated`, { params });
   }
 
+  getProfessorByUserId(userId: number): Observable<Professor> {
+    return this.http.get<Professor>(`${this.apiUrl}/user/${userId}`);
+  }
+
   getProfessorById(id: number): Observable<Professor> {
     return this.http.get<Professor>(`${this.apiUrl}/${id}`);
   }

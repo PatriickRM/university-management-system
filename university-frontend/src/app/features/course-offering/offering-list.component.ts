@@ -21,6 +21,7 @@ import { AcademicPeriod } from '../../core/models/academic-period.model';
 import { AuthService } from '../../core/services/auth.service';
 import { EnrollmentService } from '../../core/services/enrollment.service';
 import { StudentService } from '../../core/services/student.service';
+import { ProfessorService } from '../../core/services/professor.service';
 
 @Component({
   selector: 'app-offering-list',
@@ -49,6 +50,7 @@ export class OfferingListComponent implements OnInit {
   private dialog = inject(MatDialog);
   private studentService = inject(StudentService);
   private snackBar = inject(MatSnackBar);
+  private professorService = inject(ProfessorService);
 
   offerings: CourseOffering[] = [];
   filteredOfferings: CourseOffering[] = [];
@@ -56,7 +58,7 @@ export class OfferingListComponent implements OnInit {
   loading = false;
 
   periodFilter = new FormControl<number | null>(null);
-  
+  activePeriod: AcademicPeriod | null = null;
   isAdmin = false;
   isStudent = false;
   isProfessor = false;
@@ -88,37 +90,60 @@ export class OfferingListComponent implements OnInit {
     this.loading = true;
 
     if (this.isStudent) {
-      // Estudiantes ven ofertas disponibles
-      this.offeringService.getAvailableOfferings().subscribe({
-        next: (offerings) => {
-          this.offerings = offerings;
-          this.filteredOfferings = offerings;
-          this.loading = false;
+      this.periodService.getActivePeriod().subscribe({
+        next: (activePeriod) => {
+          this.activePeriod = activePeriod;
+          // Solo mostrar ofertas del período activo
+          this.offeringService.getOpenOfferingsByPeriod(activePeriod.id).subscribe({
+            next: (offerings) => {
+              this.offerings = offerings;
+              this.filteredOfferings = offerings;
+              this.loading = false;
+            },
+            error: (error) => {
+              console.error('Error loading offerings:', error);
+              this.loading = false;
+              this.showError('Error al cargar ofertas');
+            }
+          });
         },
         error: (error) => {
-          console.error('Error loading offerings:', error);
+          console.error('Error loading active period:', error);
           this.loading = false;
-          this.showError('Error al cargar ofertas');
+          this.showError('No hay período académico activo');
         }
       });
-    } else if (this.isProfessor) {
-      // Profesores ven sus ofertas (necesitas obtener el professorId del usuario)
-      const user = this.authService.getCurrentUser();
-      // Aquí deberías obtener el professorId del usuario actual
-      // Por ahora usamos todas las ofertas como fallback
-      this.offeringService.getAllOfferings().subscribe({
-        next: (offerings) => {
-          this.offerings = offerings;
-          this.filteredOfferings = offerings;
-          this.loading = false;
+    } 
+    else if (this.isProfessor) {
+      const userId = this.authService.getUserIdFromToken();
+      if (!userId) {
+        this.loading = false;
+        return;
+      }
+
+      // Primero obtener el profesor del usuario
+      this.professorService.getProfessorByUserId(userId).subscribe({
+        next: (professor) => {
+          // Ahora cargar solo las ofertas de este profesor
+          this.offeringService.getOfferingsByProfessor(professor.id).subscribe({
+            next: (offerings) => {
+              this.offerings = offerings;
+              this.filteredOfferings = offerings;
+              this.loading = false;
+            },
+            error: (error) => {
+              console.error('Error loading offerings:', error);
+              this.loading = false;
+            }
+          });
         },
         error: (error) => {
-          console.error('Error loading offerings:', error);
+          console.error('Error loading professor:', error);
           this.loading = false;
         }
       });
     } else {
-      // Admins ven todas las ofertas
+      // Admin ve todas
       this.offeringService.getAllOfferings().subscribe({
         next: (offerings) => {
           this.offerings = offerings;
@@ -128,7 +153,6 @@ export class OfferingListComponent implements OnInit {
         error: (error) => {
           console.error('Error loading offerings:', error);
           this.loading = false;
-          this.showError('Error al cargar ofertas');
         }
       });
     }

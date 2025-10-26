@@ -50,15 +50,15 @@ export class AppComponent {
     { icon: 'school', label: 'Gestión de Estudiantes', route: '/students', roles: ['ADMIN'] },
     { icon: 'person', label: 'Gestión de Profesores', route: '/professors', roles: ['ADMIN'] },
     { icon: 'book', label: 'Gestión de Cursos', route: '/courses', roles: ['ADMIN'] },
-    { icon: 'class', label: 'Ofertas de Cursos', route: '/offerings', roles: ['ADMIN', 'STUDENT'] },
+    { icon: 'class', label: 'Ofertas de Cursos', route: '/offerings', roles: ['ADMIN'] },
     { icon: 'assignment', label: 'Control de Matrículas', route: '/enrollments', roles: ['ADMIN'] },
     { icon: 'calendar_today', label: 'Períodos Académicos', route: '/periods', roles: ['ADMIN'] },
     { icon: 'business', label: 'Departamentos', route: '/departments', roles: ['ADMIN'] },
     { icon: 'analytics', label: 'Reportes y Estadísticas', route: '/reports', roles: ['ADMIN'] },
     
     //PROFESSOR
-    { icon: 'class', label: 'Mis Cursos', route: '/courses/my-courses', roles: ['PROFESSOR'] },
-    { icon: 'groups', label: 'Mis Estudiantes', route: '/students/my-students', roles: ['PROFESSOR'] },
+    { icon: 'class', label: 'Mis Cursos', route: '/professor/my-courses', roles: ['PROFESSOR'] },
+    { icon: 'groups', label: 'Mis Estudiantes', route: '/professor/my-students', roles: ['PROFESSOR'] },
     { icon: 'grading', label: 'Registrar Calificaciones', route: '/grades/manage', roles: ['PROFESSOR'] },
     { icon: 'checklist', label: 'Control de Asistencia', route: '/attendance', roles: ['PROFESSOR'] },
     { icon: 'schedule', label: 'Mi Horario', route: '/schedule', roles: ['PROFESSOR'] },
