@@ -100,6 +100,18 @@ export const routes: Routes = [
     data: { roles: ['PROFESSOR'] }
   },
   {
+    path: 'grades',
+    loadComponent: () => import('./features/student/student-grades.component').then(m => m.StudentGradesComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['STUDENT'] }
+  },
+  {
+    path: 'grades/manage',
+    loadComponent: () => import('./features/professor/professor-grades.component').then(m => m.ProfessorGradesComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['PROFESSOR'] }
+  },
+  {
     path: '**',
     redirectTo: '/dashboard'
   }

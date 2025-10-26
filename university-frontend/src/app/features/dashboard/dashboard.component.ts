@@ -148,14 +148,14 @@ export class DashboardComponent implements OnInit {
           value: 'Asignados',
           icon: 'book',
           color: '#3f51b5',
-          route: '/courses/my-courses'
+          route: '/professor/my-courses'
         },
         {
           title: 'Mis Estudiantes',
           value: 'Matriculados',
           icon: 'school',
           color: '#009688',
-          route: '/students/my-students'
+          route: '/professor/my-students'
         },
         {
           title: 'Calificaciones',
@@ -165,11 +165,11 @@ export class DashboardComponent implements OnInit {
           route: '/grades/manage'
         },
         {
-          title: 'Asistencia',
-          value: 'Registrar',
-          icon: 'checklist',
+          title: 'Horario',
+          value: 'Visualizar',
+          icon: 'hourglass_top',
           color: '#e91e63',
-          route: '/attendance'
+          route: '/schedule'
         }
       ];
     }
