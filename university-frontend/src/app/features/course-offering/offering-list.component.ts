@@ -1,4 +1,3 @@
-// university-frontend/src/app/features/course-offering/offering-list.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -13,6 +12,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Student } from '../../core/models/student.model';
+import { forkJoin } from 'rxjs';
 
 import { CourseOfferingService } from '../../core/services/course-offering.service';
 import { AcademicPeriodService } from '../../core/services/academic-period.service';
@@ -63,6 +63,9 @@ export class OfferingListComponent implements OnInit {
   isStudent = false;
   isProfessor = false;
 
+  // IDs de ofertas en las que el estudiante ya está matriculado
+  enrolledOfferingIds: Set<number> = new Set();
+
   ngOnInit(): void {
     this.isAdmin = this.authService.hasRole('ADMIN');
     this.isStudent = this.authService.hasRole('STUDENT');
@@ -90,27 +93,51 @@ export class OfferingListComponent implements OnInit {
     this.loading = true;
 
     if (this.isStudent) {
-      this.periodService.getActivePeriod().subscribe({
-        next: (activePeriod) => {
-          this.activePeriod = activePeriod;
-          // Solo mostrar ofertas del período activo
-          this.offeringService.getOpenOfferingsByPeriod(activePeriod.id).subscribe({
-            next: (offerings) => {
-              this.offerings = offerings;
-              this.filteredOfferings = offerings;
-              this.loading = false;
+      const userId = this.authService.getUserIdFromToken();
+      if (!userId) {
+        this.loading = false;
+        return;
+      }
+
+      // Cargar estudiante y sus matrículas
+      this.studentService.getByUserId(userId).subscribe({
+        next: (student) => {
+          forkJoin({
+            period: this.periodService.getActivePeriod(),
+            enrollments: this.enrollmentService.getEnrollmentsByStudent(student.id)
+          }).subscribe({
+            next: ({ period, enrollments }) => {
+              this.activePeriod = period;
+              
+              // Guardar IDs de ofertas matriculadas
+              this.enrolledOfferingIds = new Set(
+                enrollments.map(e => e.courseOffering.id)
+              );
+
+              // Cargar ofertas del período activo
+              this.offeringService.getOpenOfferingsByPeriod(period.id).subscribe({
+                next: (offerings) => {
+                  this.offerings = offerings;
+                  this.filteredOfferings = offerings;
+                  this.loading = false;
+                },
+                error: (error) => {
+                  console.error('Error loading offerings:', error);
+                  this.loading = false;
+                  this.showError('Error al cargar ofertas');
+                }
+              });
             },
             error: (error) => {
-              console.error('Error loading offerings:', error);
+              console.error('Error:', error);
               this.loading = false;
-              this.showError('Error al cargar ofertas');
+              this.showError('Error al cargar información');
             }
           });
         },
         error: (error) => {
-          console.error('Error loading active period:', error);
+          console.error('Error loading student:', error);
           this.loading = false;
-          this.showError('No hay período académico activo');
         }
       });
     } 
@@ -121,10 +148,8 @@ export class OfferingListComponent implements OnInit {
         return;
       }
 
-      // Primero obtener el profesor del usuario
       this.professorService.getProfessorByUserId(userId).subscribe({
         next: (professor) => {
-          // Ahora cargar solo las ofertas de este profesor
           this.offeringService.getOfferingsByProfessor(professor.id).subscribe({
             next: (offerings) => {
               this.offerings = offerings;
@@ -143,7 +168,6 @@ export class OfferingListComponent implements OnInit {
         }
       });
     } else {
-      // Admin ve todas
       this.offeringService.getAllOfferings().subscribe({
         next: (offerings) => {
           this.offerings = offerings;
@@ -199,8 +223,6 @@ export class OfferingListComponent implements OnInit {
     });
   }
 
-
-
   deleteOffering(offering: CourseOffering): void {
     if (confirm(`¿Eliminar la oferta de ${offering.course.courseName}?`)) {
       this.offeringService.deleteOffering(offering.id).subscribe({
@@ -218,35 +240,48 @@ export class OfferingListComponent implements OnInit {
 
   enrollInOffering(offering: CourseOffering): void {
     const userId = this.authService.getUserIdFromToken();
-    if (!userId) { this.showError('No se pudo determinar el usuario'); return; }
-
-    this.studentService.getByUserId(userId).subscribe({
-        next: (student: Student) => {
-        if (confirm(`¿Matricularte en ${offering.course.courseName}?`)) {
-            this.enrollmentService.createEnrollment({
-            studentId: student.id,
-            courseOfferingId: offering.id
-            }).subscribe({
-            next: () => { 
-                this.showSuccess('Matrícula realizada con éxito'); 
-                this.loadOfferings(); 
-            },
-            error: (error) => { 
-                console.error(error);
-                this.showError('Error al matricularse'); 
-            }
-            });
-        }
-        },
-        error: (err) => {
-        console.error(err);
-        this.showError('No se encontró perfil de estudiante');
-        }
-    });
+    if (!userId) { 
+      this.showError('No se pudo determinar el usuario'); 
+      return; 
     }
 
+    this.studentService.getByUserId(userId).subscribe({
+      next: (student: Student) => {
+        if (confirm(`¿Matricularte en ${offering.course.courseName}?`)) {
+          this.enrollmentService.createEnrollment({
+            studentId: student.id,
+            courseOfferingId: offering.id
+          }).subscribe({
+            next: () => { 
+              this.showSuccess('Matrícula realizada con éxito'); 
+              this.loadOfferings(); 
+            },
+            error: (error) => { 
+              console.error(error);
+              this.showError('Error al matricularse'); 
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.showError('No se encontró perfil de estudiante');
+      }
+    });
+  }
 
+  // Verificar si el estudiante ya está matriculado
+  isAlreadyEnrolled(offeringId: number): boolean {
+    return this.enrolledOfferingIds.has(offeringId);
+  }
 
+  // Verificar si puede matricularse
+  canEnroll(offering: CourseOffering): boolean {
+    return this.isStudent && 
+           offering.availableSeats > 0 && 
+           offering.status === 'ABIERTO' &&
+           !this.isAlreadyEnrolled(offering.id);
+  }
 
   getStatusColor(status: string): string {
     const colors: { [key: string]: string } = {

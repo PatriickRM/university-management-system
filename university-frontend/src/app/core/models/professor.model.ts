@@ -16,6 +16,7 @@ export interface Department {
   id: number;
   departmentCode: string;
   departmentName: string;
+  description?: string;
   location: string;
   status?: 'ACTIVO' | 'INACTIVO';
 }

@@ -112,6 +112,18 @@ export const routes: Routes = [
     data: { roles: ['PROFESSOR'] }
   },
   {
+    path: 'departments',
+    loadComponent: () => import('./features/department/department-list.component').then(m => m.DepartmentListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'reports',
+    loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
     path: '**',
     redirectTo: '/dashboard'
   }

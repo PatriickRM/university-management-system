@@ -1,157 +1,138 @@
-<div class="enrollment-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1>
-        <mat-icon>assignment</mat-icon>
-        {{ isStudent ? 'Mis Matrículas' : 'Control de Matrículas' }}
-      </h1>
-      <p>{{ isStudent ? 'Gestiona tus cursos matriculados' : 'Administra las matrículas del sistema' }}</p>
-    </div>
-  </div>
-
-  <!-- Filters -->
-  <mat-card class="filters-card">
-    <div class="filters-content">
-      <mat-form-field appearance="outline">
-        <mat-label>Período</mat-label>
-        <mat-select [formControl]="periodFilter">
-          <mat-option [value]="null">Todos</mat-option>
-          @for (period of periods; track period.id) {
-            <mat-option [value]="period.id">{{ period.periodCode }}</mat-option>
-          }
-        </mat-select>
-        <mat-icon matPrefix>calendar_today</mat-icon>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Estado</mat-label>
-        <mat-select [formControl]="statusFilter">
-          <mat-option [value]="null">Todos</mat-option>
-          @for (status of statusOptions; track status.value) {
-            <mat-option [value]="status.value">{{ status.label }}</mat-option>
-          }
-        </mat-select>
-        <mat-icon matPrefix>info</mat-icon>
-      </mat-form-field>
-    </div>
-  </mat-card>
-
-  <!-- Table -->
-  <mat-card class="table-card">
-    @if (loading) {
-      <div class="loading-container">
-        <mat-spinner></mat-spinner>
-      </div>
-    } @else {
-      <div class="table-container">
-        <table mat-table [dataSource]="dataSource" matSort>
-          
-          <ng-container matColumnDef="enrollmentDate">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-            <td mat-cell *matCellDef="let enrollment">
-              {{ enrollment.enrollmentDate | date:'dd/MM/yyyy' }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="student">
-            <th mat-header-cell *matHeaderCellDef>Estudiante</th>
-            <td mat-cell *matCellDef="let enrollment">
-              <div class="student-info">
-                <strong>{{ enrollment.student.fullName }}</strong>
-                <small>{{ enrollment.student.studentCode }}</small>
-              </div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="course">
-            <th mat-header-cell *matHeaderCellDef>Curso</th>
-            <td mat-cell *matCellDef="let enrollment">
-              <div class="course-info">
-                <strong>{{ enrollment.courseOffering.courseName }}</strong>
-                <small>{{ enrollment.courseOffering.courseCode }}</small>
-              </div>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="professor">
-            <th mat-header-cell *matHeaderCellDef>Profesor</th>
-            <td mat-cell *matCellDef="let enrollment">
-              {{ enrollment.courseOffering.professorName }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="period">
-            <th mat-header-cell *matHeaderCellDef>Período</th>
-            <td mat-cell *matCellDef="let enrollment">
-              <mat-chip>{{ enrollment.courseOffering.periodCode }}</mat-chip>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
-            <td mat-cell *matCellDef="let enrollment">
-              <mat-chip [color]="getStatusColor(enrollment.status)" highlighted>
-                {{ enrollment.status }}
-              </mat-chip>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="finalGrade">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nota</th>
-            <td mat-cell *matCellDef="let enrollment">
-              @if (enrollment.finalGrade) {
-                <div class="grade" [class.approved]="enrollment.finalGrade >= 10.5">
-                  {{ enrollment.finalGrade }}
-                </div>
-              } @else {
-                <span class="pending">-</span>
+<div class="container">
+      <div class="page-header">
+        <div class="header-content">
+          <h1>
+            <mat-icon>assignment</mat-icon>
+            {{ isAdmin ? 'Control de Matrículas' : 'Mis Matrículas' }}
+          </h1>
+          <p>{{ isAdmin ? 'Gestiona todas las matrículas del sistema' : 'Revisa tus cursos matriculados' }}</p>
+        </div>
+        
+        @if (isAdmin) {
+          <div class="actions">
+            <button mat-raised-button color="accent" (click)="syncStatuses()" [disabled]="syncing">
+              @if (syncing) {
+                <mat-spinner diameter="20"></mat-spinner>
               }
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let enrollment">
-              <button mat-icon-button [matMenuTriggerFor]="menu">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-              <mat-menu #menu="matMenu">
-                @if (canWithdraw(enrollment)) {
-                  <button mat-menu-item (click)="withdrawEnrollment(enrollment)">
-                    <mat-icon color="warn">cancel</mat-icon>
-                    <span>Retirarse</span>
-                  </button>
-                }
-                @if (canGrade(enrollment)) {
-                  <button mat-menu-item (click)="openGradeDialog(enrollment)">
-                    <mat-icon>grade</mat-icon>
-                    <span>Calificar</span>
-                  </button>
-                }
-              </mat-menu>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
-              <div class="empty-state">
-                <mat-icon>assignment</mat-icon>
-                <h3>No hay matrículas</h3>
-                <p>{{ isStudent ? 'Aún no te has matriculado en ningún curso' : 'No se encontraron matrículas' }}</p>
-              </div>
-            </td>
-          </tr>
-        </table>
+              @if (!syncing) {
+                 <ng-container>
+                    <mat-icon>sync</mat-icon>
+                    <span>Sincronizar Estados</span>
+                  </ng-container>
+              }
+            </button>
+          </div>
+        }
       </div>
 
-      <mat-paginator
-        [pageSize]="10"
-        [pageSizeOptions]="[10, 25, 50]"
-        showFirstLastButtons>
-      </mat-paginator>
-    }
-  </mat-card>
-</div>
+      @if (loading) {
+        <div class="loading-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      } @else {
+        @if (enrollments.length === 0) {
+          <div class="empty-state">
+            <mat-icon>assignment</mat-icon>
+            <h3>No hay matrículas</h3>
+            <p>{{ isAdmin ? 'No se encontraron matrículas en el sistema' : 'Aún no te has matriculado en ningún curso' }}</p>
+          </div>
+        } @else {
+          <mat-card class="table-card">
+            <div class="table-container">
+              <table mat-table [dataSource]="enrollments">
+                
+                <ng-container matColumnDef="studentCode">
+                  <th mat-header-cell *matHeaderCellDef>Código</th>
+                  <td mat-cell *matCellDef="let e">
+                    <strong>{{ e.student.studentCode }}</strong>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="studentName">
+                  <th mat-header-cell *matHeaderCellDef>Estudiante</th>
+                  <td mat-cell *matCellDef="let e">{{ e.student.fullName }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="course">
+                  <th mat-header-cell *matHeaderCellDef>Curso</th>
+                  <td mat-cell *matCellDef="let e">
+                    <div class="course-info">
+                      <strong>{{ e.courseOffering.courseName }}</strong>
+                      <small>{{ e.courseOffering.courseCode }}</small>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="period">
+                  <th mat-header-cell *matHeaderCellDef>Período</th>
+                  <td mat-cell *matCellDef="let e">{{ e.courseOffering.periodCode }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="professor">
+                  <th mat-header-cell *matHeaderCellDef>Profesor</th>
+                  <td mat-cell *matCellDef="let e">{{ e.courseOffering.professorName }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="enrollmentDate">
+                  <th mat-header-cell *matHeaderCellDef>Fecha Matrícula</th>
+                  <td mat-cell *matCellDef="let e">{{ e.enrollmentDate | date:'dd/MM/yyyy' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Estado</th>
+                  <td mat-cell *matCellDef="let e">
+                    <mat-chip [color]="getStatusColor(e.status)" highlighted>
+                      {{ e.status }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="grade">
+                  <th mat-header-cell *matHeaderCellDef>Nota Final</th>
+                  <td mat-cell *matCellDef="let e">
+                    @if (e.finalGrade !== null && e.finalGrade !== undefined) {
+                      <div class="grade" [class.approved]="e.finalGrade >= 10.5">
+                        {{ e.finalGrade }}
+                      </div>
+                    } @else {
+                      <span class="no-grade">--</span>
+                    }
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                  <td mat-cell *matCellDef="let e">
+                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      @if (isAdmin) {
+                        <button mat-menu-item (click)="editEnrollment(e)">
+                          <mat-icon>edit</mat-icon>
+                          <span>Cambiar Estado</span>
+                        </button>
+                        <button mat-menu-item (click)="deleteEnrollment(e)">
+                          <mat-icon color="warn">delete</mat-icon>
+                          <span>Eliminar</span>
+                        </button>
+                      } @else {
+                        @if (canWithdraw(e)) {
+                          <button mat-menu-item (click)="withdrawEnrollment(e)">
+                            <mat-icon color="warn">exit_to_app</mat-icon>
+                            <span>Retirarme</span>
+                          </button>
+                        }
+                      }
+                    </mat-menu>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+              </table>
+            </div>
+          </mat-card>
+        }
+      }
+    </div>

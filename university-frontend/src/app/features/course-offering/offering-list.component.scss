@@ -1,120 +1,184 @@
 .offering-container {
-      padding: 24px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
 
-    .page-header {
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .header-content {
+    h1 {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      gap: 12px;
+      margin: 0 0 8px 0;
+      font-size: 2rem;
+      color: #2c3e50;
 
-      .header-content {
-        h1 {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin: 0 0 8px 0;
-          font-size: 2rem;
-          color: #2c3e50;
-
-          mat-icon {
-            font-size: 32px;
-            width: 32px;
-            height: 32px;
-            color: #e91e63;
-          }
-        }
-
-        p {
-          margin: 0;
-          color: #7f8c8d;
-        }
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        color: #e91e63;
       }
     }
 
-    .filter-card {
-      margin-bottom: 24px;
-      padding: 16px;
+    p {
+      margin: 0;
+      color: #7f8c8d;
+    }
+  }
+}
 
-      mat-form-field {
-        width: 100%;
-        max-width: 400px;
-      }
+.filter-card {
+  margin-bottom: 24px;
+  padding: 16px;
+
+  mat-form-field {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+.info-card {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+
+  .period-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
 
-    .loading-container {
-      display: flex;
-      justify-content: center;
-      padding: 64px;
+    strong {
+      margin-right: 8px;
     }
+  }
+}
 
-    .offerings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-      gap: 24px;
-    }
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 64px;
+}
 
-    .offering-card {
-      transition: all 0.3s ease;
-      border-top: 4px solid #e91e63;
+// Diseño horizontal - una tarjeta por fila
+.offerings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-      &.full {
-        border-top-color: #f44336;
-        opacity: 0.8;
-      }
+.offering-card {
+  width: 100%;
+  transition: all 0.3s ease;
+  border-left: 6px solid #e91e63;
 
-      &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      }
+  &.full {
+    border-left-color: #f44336;
+    opacity: 0.85;
+  }
 
-      .offering-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
+  &.enrolled {
+    border-left-color: #4caf50;
+    background: #f1f8f4;
+  }
 
-        .course-code {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #7f8c8d;
-        }
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-content {
+    padding: 20px;
+  }
+
+  .offering-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f0f0f0;
+
+    .course-info {
+      flex: 1;
+
+      .course-code {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #f0f0f0;
+        border-radius: 6px;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: #7f8c8d;
+        margin-bottom: 8px;
       }
 
       h3 {
-        margin: 0 0 16px 0;
-        font-size: 1.25rem;
+        margin: 0;
+        font-size: 1.5rem;
         color: #2c3e50;
+        font-weight: 600;
       }
+    }
+  }
 
-      .offering-info {
+  .offering-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr;
+    gap: 24px;
+    margin-bottom: 16px;
+
+    .info-section,
+    .enrollment-section,
+    .schedule-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-section {
+      .info-row {
         display: flex;
-        flex-direction: column;
+        align-items: center;
         gap: 8px;
-        margin-bottom: 16px;
+        padding: 8px 0;
+        font-size: 0.9375rem;
+        color: #64748b;
 
-        .info-row {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 0.875rem;
-          color: #64748b;
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: #e91e63;
+        }
 
-          mat-icon {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-          }
+        span {
+          font-weight: 500;
         }
       }
+    }
 
+    .enrollment-section {
       .enrollment-info {
-        padding: 12px;
+        padding: 16px;
         background: #f8f9fa;
-        border-radius: 8px;
-        margin-bottom: 16px;
+        border-radius: 12px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
 
         .seats {
           display: flex;
@@ -124,16 +188,16 @@
           color: #64748b;
 
           strong {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             color: #2c3e50;
           }
         }
 
         .progress-bar {
           width: 100%;
-          height: 6px;
+          height: 8px;
           background: #e0e0e0;
-          border-radius: 3px;
+          border-radius: 4px;
           overflow: hidden;
           margin-bottom: 8px;
 
@@ -147,34 +211,41 @@
         small {
           font-size: 0.75rem;
           color: #7f8c8d;
+          text-align: center;
+        }
+      }
+    }
+
+    .schedule-section {
+      h4 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 12px 0;
+        font-size: 1rem;
+        color: #2c3e50;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: #e91e63;
         }
       }
 
-      .schedule {
-        h4 {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin: 0 0 12px 0;
-          font-size: 0.9375rem;
-          color: #2c3e50;
-
-          mat-icon {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-          }
-        }
+      .time-slots {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
 
         .time-slot {
           display: flex;
           align-items: center;
           gap: 8px;
-          padding: 8px;
+          padding: 10px 12px;
           background: #f8f9fa;
-          border-radius: 6px;
-          margin-bottom: 6px;
-          font-size: 0.8125rem;
+          border-radius: 8px;
+          font-size: 0.875rem;
 
           mat-icon {
             font-size: 16px;
@@ -183,39 +254,82 @@
             color: #64748b;
           }
 
+          span {
+            flex: 1;
+          }
+
           mat-chip {
             font-size: 0.75rem;
-            min-height: 20px;
+            min-height: 24px;
+            background: #e91e63;
+            color: white;
           }
         }
       }
-
-      mat-card-actions {
-        border-top: 1px solid #e0e0e0;
-        padding: 12px 16px;
-        display: flex;
-        justify-content: space-between;
-      }
     }
+  }
 
-    .empty-state {
+  mat-card-actions {
+    border-top: 1px solid #e0e0e0;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  color: #7f8c8d;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+  .offering-card .offering-details {
+    grid-template-columns: 1fr 1fr;
+    
+    .schedule-section {
       grid-column: 1 / -1;
-      text-align: center;
-      padding: 64px 24px;
-      color: #7f8c8d;
-
-      mat-icon {
-        font-size: 64px;
-        width: 64px;
-        height: 64px;
-        margin-bottom: 16px;
-      }
-        h3 {
-        margin: 0 0 8px 0;
-        font-size: 1.5rem;
-        }
-        p {
-        margin: 0;
-        font-size: 1rem;
-        }
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .offering-card .offering-details {
+    grid-template-columns: 1fr;
+    
+    .info-section,
+    .enrollment-section,
+    .schedule-section {
+      grid-column: 1;
+    }
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    button {
+      width: 100%;
+    }
+  }
+}

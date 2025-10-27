@@ -61,4 +61,10 @@ export class EnrollmentService {
     return this.http.get<Enrollment[]>(`${this.apiUrl}/student/${studentId}/status/${status}`);
   }
 
+  startEnrollment(id: number): Observable<Enrollment> {
+    return this.http.patch<Enrollment>(`${this.apiUrl}/${id}/start`, {});
+  }
+  syncEnrollmentStatuses(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/sync-statuses`, {});
+  }
 }   

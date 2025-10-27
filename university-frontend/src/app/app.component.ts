@@ -60,7 +60,6 @@ export class AppComponent {
     { icon: 'class', label: 'Mis Cursos', route: '/professor/my-courses', roles: ['PROFESSOR'] },
     { icon: 'groups', label: 'Mis Estudiantes', route: '/professor/my-students', roles: ['PROFESSOR'] },
     { icon: 'grading', label: 'Registrar Calificaciones', route: '/grades/manage', roles: ['PROFESSOR'] },
-    { icon: 'checklist', label: 'Control de Asistencia', route: '/attendance', roles: ['PROFESSOR'] },
     { icon: 'schedule', label: 'Mi Horario', route: '/schedule', roles: ['PROFESSOR'] },
     
     //STUDENT
@@ -68,7 +67,6 @@ export class AppComponent {
     { icon: 'class', label: 'Ofertas de Cursos', route: '/offerings', roles: ['STUDENT'] },
     { icon: 'grade', label: 'Mis Calificaciones', route: '/grades', roles: ['STUDENT'] },
     { icon: 'schedule', label: 'Mi Horario', route: '/schedule', roles: ['STUDENT'] },
-    { icon: 'account_balance_wallet', label: 'Estado de Cuenta', route: '/payments', roles: ['STUDENT'] },
   ];
 
   get menuItems(): MenuItem[] {
