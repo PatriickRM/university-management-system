@@ -31,7 +31,7 @@ public class DepartmentController {
         DepartmentResponseDTO department = departmentService.createDepartment(dto);
         return ResponseEntity.ok(department);
     }
-    @PutMapping
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartmentResponseDTO> updateDepartment(@PathVariable Long id, @Valid @RequestBody DepartmentUpdateRequestDTO dto){
         DepartmentResponseDTO department = departmentService.updateDepartment(id,dto);
@@ -52,7 +52,7 @@ public class DepartmentController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> deleteDepartment(@PathVariable Long id){
         departmentService.deleteDepartment(id);

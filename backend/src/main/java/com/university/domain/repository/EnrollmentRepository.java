@@ -34,6 +34,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
             "AND e.status IN ('MATRICULADO', 'EN_CURSO')")
     Long countCreditsByStudentAndPeriod(@Param("studentId") Long studentId, @Param("periodId") Long periodId);
 
+    @Query("SELECT e FROM Enrollment e WHERE e.status = :status AND e.courseOffering.academicPeriod.id = :periodId")
+    List<Enrollment> findByStatusAndAcademicPeriod(@Param("status") EnrollmentStatus status, @Param("periodId") Long periodId);
 
     boolean existsByStudentIdAndCourseOfferingId(Long studentId, Long courseOfferingId);
 }

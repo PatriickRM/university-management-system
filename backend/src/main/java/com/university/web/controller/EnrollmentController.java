@@ -1,6 +1,7 @@
 package com.university.web.controller;
 
 import com.university.application.service.EnrollmentService;
+import com.university.application.service.impl.ScheduledTasksService;
 import com.university.domain.model.enums.EnrollmentStatus;
 import com.university.web.dto.enrollment.EnrollmentCreateRequestDTO;
 import com.university.web.dto.enrollment.EnrollmentResponseDTO;
@@ -24,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EnrollmentController {
     private final EnrollmentService enrollmentService;
+    private final ScheduledTasksService scheduledTasksService;
 
     // Crear matrícula
     @PostMapping
@@ -161,4 +163,12 @@ public class EnrollmentController {
         enrollmentService.deleteEnrollment(id);
         return ResponseEntity.ok(Map.of("mensaje", "Matrícula eliminada correctamente"));
     }
+
+    @PostMapping("/sync-statuses")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> syncEnrollmentStatuses() {
+        scheduledTasksService.updateEnrollmentStatuses();
+        return ResponseEntity.ok(Map.of("mensaje", "Estados sincronizados correctamente"));
+    }
+
 }
