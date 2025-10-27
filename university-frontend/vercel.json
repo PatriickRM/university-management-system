@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "public": false,
-  "github": { "silent": true },
+  "framework": "angular",
   "buildCommand": "npm run build",
   "outputDirectory": "dist/university-frontend/browser",
-  "framework": "angular",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
