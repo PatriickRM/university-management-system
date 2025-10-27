@@ -8,11 +8,13 @@ spring:
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
+      idle-timeout: 600000           # 10 min
+      max-lifetime: 1200000          # 20 min
       connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+      keepalive-time: 300000         # 5 min
+      validation-timeout: 5000
       connection-test-query: SELECT 1
-      leak-detection-threshold: 60000
+
 
   jpa:
     hibernate:
