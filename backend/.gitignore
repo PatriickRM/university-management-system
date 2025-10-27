@@ -33,3 +33,12 @@ build/
 ### VS Code ###
 .vscode/
 .env
+*.env
+.env.local
+.env.production
+
+#LOGS
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
