@@ -3,19 +3,23 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL}?sslmode=require&prepareThreshold=0
+    url: ${DATABASE_URL}?sslmode=require
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
       idle-timeout: 600000         # 10 min
-      max-lifetime: 900000         # 🔹 15 min
+      max-lifetime: 900000         # 15 min
       connection-timeout: 30000
-      keepalive-time: 300000       # 🔹 5 min
+      keepalive-time: 300000       # 5 min
       validation-timeout: 5000
       connection-test-query: SELECT 1
       auto-commit: true
       leak-detection-threshold: 60000
+      data-source-properties:
+        prepareThreshold: 0
+        preparedStatementCacheQueries: 0
+        preparedStatementCacheSizeMiB: 0
 
   jpa:
     hibernate:
