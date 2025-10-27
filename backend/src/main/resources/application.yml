@@ -42,12 +42,3 @@ logging:
     org.springframework.web: INFO
     org.hibernate: WARN
     com.zaxxer.hikari: INFO
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
