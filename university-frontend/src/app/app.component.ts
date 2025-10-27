@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from './core/services/auth.service';
+import { User } from './core/models/user.model'; // ← IMPORTANTE: Agregar import
 
 interface MenuItem {
   icon: string;
@@ -41,6 +42,11 @@ export class AppComponent {
   private router = inject(Router);
 
   currentUser$ = this.authService.currentUser$;
+
+  // ← AGREGAR ESTO
+  get currentUser(): User | null {
+    return this.authService.getCurrentUser();
+  }
 
   allMenuItems: MenuItem[] = [
     // Dashboard -

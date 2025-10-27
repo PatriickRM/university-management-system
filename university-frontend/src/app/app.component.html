@@ -1,7 +1,7 @@
 @if (isLoginPage()) {
   <router-outlet></router-outlet>
 } @else {
-  @if (currentUser$ | async; as user) {
+  @if (currentUser; as user) {
     <mat-sidenav-container class="sidenav-container">
       <!-- Sidenav -->
       <mat-sidenav #sidenav mode="side" opened class="sidenav">
@@ -39,7 +39,7 @@
 
           <!-- User Menu -->
           <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
-            <div class="user-avatar">
+            <div class="user-avatar" [style.background]="getAvatarColor()">
               {{ getUserInitials(user.firstName, user.lastName) }}
             </div>
             <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
