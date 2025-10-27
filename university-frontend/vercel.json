@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "framework": "angular",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/university-frontend/browser",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|json))",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }

@@ -4,10 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:university-frontend": "node dist/university-frontend/server/server.mjs"
+    "build": "ng build --configuration production",
+    "watch": "ng build --watch --configuration development"
   },
   "prettier": {
     "printWidth": 100,
