@@ -1,35 +1,13 @@
 {
   "version": 2,
-  "public": false,
-  "github": {
-    "silent": true
-  },
-  "buildCommand": "cd university-frontend && npm run build",
-  "outputDirectory": "university-frontend/dist/university-frontend/browser",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/university-frontend/browser",
+  "installCommand": "npm install",
   "framework": "angular",
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-Requested-With, Content-Type, Authorization"
-        }
-      ]
     }
   ]
 }
