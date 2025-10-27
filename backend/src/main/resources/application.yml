@@ -3,18 +3,19 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL}
+    url: ${DATABASE_URL}?prepareThreshold=0
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
-      idle-timeout: 600000           # 10 min
-      max-lifetime: 1200000          # 20 min
+      idle-timeout: 600000         # 10 min
+      max-lifetime: 900000         # 🔹 15 min
       connection-timeout: 30000
-      keepalive-time: 300000         # 5 min
+      keepalive-time: 300000       # 🔹 5 min
       validation-timeout: 5000
       connection-test-query: SELECT 1
-
+      auto-commit: true
+      leak-detection-threshold: 60000
 
   jpa:
     hibernate:
@@ -27,6 +28,7 @@ spring:
         jdbc.batch_size: 20
         order_inserts: true
         order_updates: true
+        connection.release_mode: after_transaction
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:secrets}
 
