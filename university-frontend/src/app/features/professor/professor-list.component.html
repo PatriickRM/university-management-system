@@ -31,10 +31,21 @@
             <mat-icon>filter_list</mat-icon>
             Filtros
           </button>
-          <button mat-stroked-button>
+          <button mat-stroked-button [matMenuTriggerFor]="exportMenu">
             <mat-icon>download</mat-icon>
             Exportar
           </button>
+
+          <mat-menu #exportMenu="matMenu">
+            <button mat-menu-item (click)="exportProfessorsExcel()">
+              <mat-icon>table_chart</mat-icon>
+              Exportar a Excel
+            </button>
+            <button mat-menu-item (click)="exportProfessorsPDF()">
+              <mat-icon>picture_as_pdf</mat-icon>
+              Exportar a PDF
+            </button>
+          </mat-menu>
         </div>
       }
     </div>

@@ -21,6 +21,11 @@ import { StudentService } from '../../core/services/student.service';
 import { Student } from '../../core/models/student.model';
 import { AuthService } from '../../core/services/auth.service';
 import { StudentFormDialogComponent } from './student-form-dialog/student-form-dialog.component';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 @Component({
   selector: 'app-student-list',
@@ -221,4 +226,78 @@ export class StudentListComponent implements OnInit {
   getFullName(student: Student): string {
     return `${student.user.firstName} ${student.user.lastName}`;
   }
+  //EXPORTAR ESTUDIANTES A EXCEL
+  exportStudentsExcel(): void {
+    const data = this.dataSource.data.map(s => ({
+      'Código Estudiante': s.studentCode ?? '',
+      'Nombre Completo': `${s.user.firstName} ${s.user.lastName}`,
+      'Email': s.user.email ?? '',
+      'Carrera': s.career?.careerName ?? '',
+      'Código Carrera': s.career?.careerCode ?? '',
+      'Semestre Actual': s.currentSemester ?? '',
+      'Estado Académico': s.academicStatus ?? ''
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Estudiantes');
+
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    const date = new Date().toLocaleDateString().replace(/\//g, '-');
+    saveAs(blob, `Estudiantes_${date}.xlsx`);
+
+    this.snackBar.open('Reporte de estudiantes descargado en Excel', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+  }
+
+  //EXPORTAR ESTUDIANTES A PDF
+  exportStudentsPDF(): void {
+    const doc = new jsPDF('landscape');
+    const currentUser = this.authService.getCurrentUser();
+    const userLabel = currentUser ? currentUser.email : 'Usuario desconocido';
+    const currentDate = new Date().toLocaleDateString();
+
+    // Encabezado
+    doc.setFontSize(18);
+    doc.text('Reporte de Estudiantes', 14, 20);
+
+    doc.setFontSize(10);
+    doc.text(`Generado por: ${userLabel}`, 14, 28);
+    doc.text(`Fecha: ${currentDate}`, 14, 34);
+
+    // Tabla
+    const tableData: (string | number)[][] = this.dataSource.data.map(s => [
+      s.studentCode ?? '',
+      `${s.user.firstName} ${s.user.lastName}`,
+      s.user.email ?? '',
+      s.career?.careerName ?? '',
+      s.career?.careerCode ?? '',
+      s.currentSemester ?? '',
+      s.academicStatus ?? ''
+    ]);
+
+    autoTable(doc, {
+      head: [['Código', 'Nombre Completo', 'Email', 'Carrera', 'Código Carrera', 'Semestre', 'Estado']],
+      body: tableData,
+      startY: 40,
+      theme: 'grid',
+      headStyles: { fillColor: [51, 102, 255] },
+      styles: { fontSize: 9 }
+    });
+
+    const date = new Date().toLocaleDateString().replace(/\//g, '-');
+    doc.save(`Estudiantes_${date}.pdf`);
+
+    this.snackBar.open('Reporte de estudiantes descargado en PDF', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+  }
+
 }

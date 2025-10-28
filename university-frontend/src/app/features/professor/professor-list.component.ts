@@ -16,7 +16,10 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import { ProfessorService } from '../../core/services/professor.service';
 import { Professor } from '../../core/models/professor.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -232,4 +235,79 @@ export class ProfessorListComponent implements OnInit {
   getFullName(professor: Professor): string {
     return `${professor.user.firstName} ${professor.user.lastName}`;
   }
+  
+  //EXPORTAR PROFESORES A EXCEL
+  exportProfessorsExcel(): void {
+  const data = this.dataSource.data.map(p => ({
+    'Código Empleado': p.employeeCode ?? '',
+    'Nombre Completo': `${p.user.firstName} ${p.user.lastName}`,
+    'Email': p.user.email ?? '',
+    'Departamento': p.department?.departmentName ?? '',
+    'Especialización': p.specialization ?? 'N/A',
+    'Tipo Contrato': p.employmentType === 'FULL_TIME' ? 'Tiempo Completo' : 'Tiempo Parcial',
+    'Estado': p.status ?? ''
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Profesores');
+
+  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  });
+
+  const date = new Date().toLocaleDateString().replace(/\//g, '-');
+  saveAs(blob, `Profesores_${date}.xlsx`);
+
+  this.snackBar.open('Reporte de profesores descargado en Excel', 'Cerrar', {
+    duration: 3000,
+    panelClass: ['success-snackbar']
+  });
+}
+
+//EXPORTAR PROFESORES A PDF
+exportProfessorsPDF(): void {
+  const doc = new jsPDF('landscape');
+  const currentUser = this.authService.getCurrentUser();
+  const userLabel = currentUser ? currentUser.email : 'Usuario desconocido';
+  const currentDate = new Date().toLocaleDateString();
+
+  // Encabezado
+  doc.setFontSize(18);
+  doc.text('Reporte de Profesores', 14, 20);
+
+  doc.setFontSize(10);
+  doc.text(`Generado por: ${userLabel}`, 14, 28);
+  doc.text(`Fecha: ${currentDate}`, 14, 34);
+
+  // Datos
+  const tableData: (string | number)[][] = this.dataSource.data.map(p => [
+    p.employeeCode ?? '',
+    `${p.user.firstName} ${p.user.lastName}`,
+    p.user.email ?? '',
+    p.department?.departmentName ?? '',
+    p.specialization ?? 'N/A',
+    p.employmentType === 'FULL_TIME' ? 'Tiempo Completo' : 'Tiempo Parcial',
+    p.status ?? ''
+  ]);
+
+  autoTable(doc, {
+    head: [['Código', 'Nombre Completo', 'Email', 'Departamento', 'Especialización', 'Tipo Contrato', 'Estado']],
+    body: tableData,
+    startY: 40,
+    theme: 'grid',
+    headStyles: { fillColor: [51, 102, 255] },
+    styles: { fontSize: 9 }
+  });
+
+  const date = new Date().toLocaleDateString().replace(/\//g, '-');
+  doc.save(`Profesores_${date}.pdf`);
+
+  this.snackBar.open('Reporte de profesores descargado en PDF', 'Cerrar', {
+    duration: 3000,
+    panelClass: ['success-snackbar']
+  });
+}
+
 }
