@@ -423,10 +423,76 @@
   }
 }
 
-// ========================================
-// CONTENT
-// ========================================
 .content {
   min-height: calc(100vh - 64px);
   background: #f8f9fa;
+}
+
+.student-portal-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  .student-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .logo-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.125rem;
+      font-weight: 600;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .user-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: white;
+      }
+
+      .user-name {
+        font-weight: 500;
+      }
+    }
+  }
+
+  .student-content {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+.user-menu-header {
+  padding: 16px;
+  text-align: center;
+
+  .user-email {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
 }

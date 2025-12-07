@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -8,8 +8,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatBadgeModule } from '@angular/material/badge';
 import { AuthService } from './core/services/auth.service';
-import { User } from './core/models/user.model'; // ← IMPORTANTE: Agregar import
+import { MessageService } from './core/services/message.service';
+import { User } from './core/models/user.model';
 
 interface MenuItem {
   icon: string;
@@ -32,25 +34,27 @@ interface MenuItem {
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    MatBadgeModule
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   private authService = inject(AuthService);
+  private messageService = inject(MessageService);
   private router = inject(Router);
 
   currentUser$ = this.authService.currentUser$;
+  unreadMessages = 0;
 
-  // ← AGREGAR ESTO
   get currentUser(): User | null {
     return this.authService.getCurrentUser();
   }
 
   allMenuItems: MenuItem[] = [
-    // Dashboard -
-    { icon: 'dashboard', label: 'Dashboard', route: '/dashboard', roles: ['ADMIN', 'PROFESSOR', 'STUDENT'] },
+    //ADMIN & PROFESSOR
+    { icon: 'dashboard', label: 'Dashboard', route: '/dashboard', roles: ['ADMIN', 'PROFESSOR'] },
     
     //ADMIN
     { icon: 'school', label: 'Gestión de Estudiantes', route: '/students', roles: ['ADMIN'] },
@@ -66,14 +70,39 @@ export class AppComponent {
     { icon: 'class', label: 'Mis Cursos', route: '/professor/my-courses', roles: ['PROFESSOR'] },
     { icon: 'groups', label: 'Mis Estudiantes', route: '/professor/my-students', roles: ['PROFESSOR'] },
     { icon: 'grading', label: 'Registrar Calificaciones', route: '/grades/manage', roles: ['PROFESSOR'] },
-    { icon: 'schedule', label: 'Mi Horario', route: '/schedule', roles: ['PROFESSOR'] },
+    { icon: 'schedule', label: 'Mi Horario', route: '/professor/schedule', roles: ['PROFESSOR'] },
     
     //STUDENT
-    { icon: 'assignment', label: 'Mis Matrículas', route: '/enrollments/my-enrollments', roles: ['STUDENT'] },
-    { icon: 'class', label: 'Ofertas de Cursos', route: '/offerings', roles: ['STUDENT'] },
-    { icon: 'grade', label: 'Mis Calificaciones', route: '/grades', roles: ['STUDENT'] },
-    { icon: 'schedule', label: 'Mi Horario', route: '/schedule', roles: ['STUDENT'] },
+    { icon: 'home', label: 'Portal Estudiantil', route: '/student/portal', roles: ['STUDENT'] },
+    { icon: 'mail', label: 'Mensajes', route: '/student/messages', roles: ['STUDENT'] },
+    { icon: 'account_circle', label: 'Mi Perfil', route: '/student/profile', roles: ['STUDENT'] },
   ];
+
+  ngOnInit(): void {
+    this.checkUserRoleAndRedirect();
+    this.loadUnreadMessages();
+  }
+
+  checkUserRoleAndRedirect(): void {
+    const user = this.currentUser;
+    if (!user) return;
+
+    //Si es estudiante y está en el dashboard, redirigir al portal
+    if (this.authService.hasRole('STUDENT') && this.router.url === '/dashboard') {
+      this.router.navigate(['/student/portal']);
+    }
+  }
+
+  loadUnreadMessages(): void {
+    if (this.authService.hasRole('STUDENT') || this.authService.hasRole('PROFESSOR')) {
+      this.messageService.getUnreadCount().subscribe({
+        next: (result) => {
+          this.unreadMessages = result.unreadCount;
+        },
+        error: (err) => console.error('Error loading unread messages:', err)
+      });
+    }
+  }
 
   get menuItems(): MenuItem[] {
     const user = this.authService.getCurrentUser();
@@ -103,6 +132,14 @@ export class AppComponent {
 
   isLoginPage(): boolean {
     return this.router.url === '/login';
+  }
+
+  isStudentPortalPage(): boolean {
+    return this.router.url === '/student/portal';
+  }
+
+  shouldShowSidebar(): boolean {
+    return !this.isLoginPage() && !this.isStudentPortalPage();
   }
 
   getUserInitials(firstName?: string, lastName?: string): string {
