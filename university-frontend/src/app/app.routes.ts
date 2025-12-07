@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, roleGuard } from './core/guards/auth.guard';
 
-
 export const routes: Routes = [
   {
     path: '',
@@ -17,51 +16,30 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
+  
+  //ADMIN
   {
     path: 'students',
-    loadComponent: () => import('../app/features/student/student-list.component').then(m => m.StudentListComponent),
+    loadComponent: () => import('./features/student/student-list.component').then(m => m.StudentListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'STUDENT'] }
   },
   {
     path: 'students/create',
-    loadComponent: () => import('../app/features/student/student-list.component').then(m => m.StudentListComponent),
+    loadComponent: () => import('./features/student/student-list.component').then(m => m.StudentListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
-  
   {
     path: 'professors',
-    loadComponent: () => import('../app/features/professor/professor-list.component').then(m => m.ProfessorListComponent),
+    loadComponent: () => import('./features/professor/professor-list.component').then(m => m.ProfessorListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN', 'PROFESSOR'] }
   },
   {
     path: 'courses',
-    loadComponent: () => import('../app/features/course/course-list.component').then(m => m.CourseListComponent),
+    loadComponent: () => import('./features/course/course-list.component').then(m => m.CourseListComponent),
     canActivate: [authGuard]
-  },
-  {
-    path: 'courses/available',
-    loadComponent: () => import('../app/features/course/course-list.component').then(m => m.CourseListComponent),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['STUDENT'] }
-  },
-  {
-    path: 'courses/my-courses',
-    loadComponent: () => import('../app/features/course/course-list.component').then(m => m.CourseListComponent),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['PROFESSOR'] }
-  },
-  {
-    path: 'schedule',
-    loadComponent: () => import('./features/schedule/schedule-view.component').then(m => m.ScheduleViewComponent),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['STUDENT', 'PROFESSOR'] }
-  },
-  {
-    path: 'unauthorized',
-    loadComponent: () => import('./shared/components/unauthorized.component').then(m => m.UnauthorizedComponent)
   },
   {
     path: 'periods',
@@ -82,11 +60,19 @@ export const routes: Routes = [
     data: { roles: ['ADMIN'] }
   },
   {
-    path: 'enrollments/my-enrollments',
-    loadComponent: () => import('./features/enrollment/enrollment-list.component').then(m => m.EnrollmentListComponent),
+    path: 'departments',
+    loadComponent: () => import('./features/department/department-list.component').then(m => m.DepartmentListComponent),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['STUDENT'] }
+    data: { roles: ['ADMIN'] }
   },
+  {
+    path: 'reports',
+    loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  
+  //PROFESSOR
   {
     path: 'professor/my-courses',
     loadComponent: () => import('./features/professor/professor-courses.component').then(m => m.ProfessorCoursesComponent),
@@ -100,10 +86,10 @@ export const routes: Routes = [
     data: { roles: ['PROFESSOR'] }
   },
   {
-    path: 'grades',
-    loadComponent: () => import('./features/student/student-grades.component').then(m => m.StudentGradesComponent),
+    path: 'professor/schedule',
+    loadComponent: () => import('./features/schedule/schedule-view.component').then(m => m.ScheduleViewComponent),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['STUDENT'] }
+    data: { roles: ['PROFESSOR'] }
   },
   {
     path: 'grades/manage',
@@ -111,17 +97,48 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['PROFESSOR'] }
   },
+  
+  //STUDENT
   {
-    path: 'departments',
-    loadComponent: () => import('./features/department/department-list.component').then(m => m.DepartmentListComponent),
+    path: 'student/portal',
+    loadComponent: () => import('./features/student/student-portal/student-portal.component').then(m => m.StudentPortalComponent),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['ADMIN'] }
+    data: { roles: ['STUDENT'] }
   },
   {
-    path: 'reports',
-    loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent),
+    path: 'student/messages',
+    loadComponent: () => import('./features/student/student-messages/student-messages.component').then(m => m.StudentMessagesComponent),
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['ADMIN'] }
+    data: { roles: ['STUDENT'] }
+  },
+  {
+    path: 'student/profile',
+    loadComponent: () => import('./features/student/student-profile/student-profile.component').then(m => m.StudentProfileComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['STUDENT'] }
+  },
+  {
+    path: 'enrollments/my-enrollments',
+    loadComponent: () => import('./features/enrollment/enrollment-list.component').then(m => m.EnrollmentListComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['STUDENT'] }
+  },
+  {
+    path: 'grades',
+    loadComponent: () => import('./features/student/student-grades.component').then(m => m.StudentGradesComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['STUDENT'] }
+  },
+  
+  {
+    path: 'schedule',
+    loadComponent: () => import('./features/schedule/schedule-view.component').then(m => m.ScheduleViewComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['STUDENT', 'PROFESSOR'] }
+  },
+  {
+    path: 'unauthorized',
+    loadComponent: () => import('./shared/components/unauthorized.component').then(m => m.UnauthorizedComponent)
   },
   {
     path: '**',

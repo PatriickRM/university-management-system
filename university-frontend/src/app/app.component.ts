@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterModule, Router } from '@angular/router';
+import { RouterOutlet, RouterModule, Router, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -12,6 +12,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { AuthService } from './core/services/auth.service';
 import { MessageService } from './core/services/message.service';
 import { User } from './core/models/user.model';
+import { Subscription, filter } from 'rxjs';
 
 interface MenuItem {
   icon: string;
@@ -40,13 +41,15 @@ interface MenuItem {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private messageService = inject(MessageService);
   private router = inject(Router);
 
   currentUser$ = this.authService.currentUser$;
   unreadMessages = 0;
+  
+  private subscriptions: Subscription[] = [];
 
   get currentUser(): User | null {
     return this.authService.getCurrentUser();
@@ -79,17 +82,45 @@ export class AppComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.checkUserRoleAndRedirect();
-    this.loadUnreadMessages();
+    //Escuchar cambios en el usuario autenticado
+    const userSub = this.currentUser$.subscribe(user => {
+      if (user) {
+        this.checkUserRoleAndRedirect();
+        this.loadUnreadMessages();
+      }
+    });
+
+    //Escuchar cambios de navegación
+    const routerSub = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.checkUserRoleAndRedirect();
+      });
+
+    this.subscriptions.push(userSub, routerSub);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   checkUserRoleAndRedirect(): void {
     const user = this.currentUser;
     if (!user) return;
 
-    //Si es estudiante y está en el dashboard, redirigir al portal
-    if (this.authService.hasRole('STUDENT') && this.router.url === '/dashboard') {
-      this.router.navigate(['/student/portal']);
+    const currentUrl = this.router.url;
+
+    // Si es estudiante y está en dashboard o raíz, redirigir al portal
+    if (this.authService.hasRole('STUDENT')) {
+      if (currentUrl === '/dashboard' || currentUrl === '/' || currentUrl === '') {
+        this.router.navigate(['/student/portal']);
+      }
+    }
+    // Si es ADMIN o PROFESSOR y está en la raíz, redirigir al dashboard
+    else if (this.authService.hasRole('ADMIN') || this.authService.hasRole('PROFESSOR')) {
+      if (currentUrl === '/' || currentUrl === '') {
+        this.router.navigate(['/dashboard']);
+      }
     }
   }
 
@@ -135,7 +166,7 @@ export class AppComponent implements OnInit {
   }
 
   isStudentPortalPage(): boolean {
-    return this.router.url === '/student/portal';
+    return this.router.url.startsWith('/student/');
   }
 
   shouldShowSidebar(): boolean {
