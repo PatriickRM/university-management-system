@@ -111,7 +111,7 @@ import { AuthService } from '../../../core/services/auth.service';
                         <span class="conv-time">{{ formatMessageTime(conv.lastMessageAt) }}</span>
                       </div>
                       <div class="conv-preview">
-                        <span class="last-message">{{ conv.lastMessage || 'Sin mensajes' }}</span>
+                        <span class="last-message">{{ conv.lastMessageContent || 'Sin mensajes' }}</span>
                         @if (conv.unreadCount > 0) {
                           <mat-icon class="unread-indicator" matBadge="{{ conv.unreadCount }}" 
                                     matBadgeColor="warn" matBadgeSize="small">
@@ -795,20 +795,39 @@ export class StudentMessagesComponent implements OnInit, OnDestroy {
   }
 
   loadConversations(): void {
-    this.loadingConversations = true;
-    this.messageService.getUserConversations().subscribe({
-      next: (conversations) => {
-        this.conversations = conversations.sort((a, b) => 
-          new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
-        );
-        this.loadingConversations = false;
-      },
-      error: (err) => {
-        console.error('Error loading conversations:', err);
-        this.loadingConversations = false;
-      }
-    });
-  }
+  this.loadingConversations = true;
+  this.messageService.getUserConversations().subscribe({
+    next: (conversations) => {
+      // Procesar las conversaciones para agregar otherParticipant
+      this.conversations = conversations.map(conv => {
+        // Determinar quién es el otro participante
+        const isParticipant1 = conv.participant1Id === this.currentUserId;
+        
+        return {
+          ...conv,
+          otherParticipant: {
+            id: isParticipant1 ? conv.participant2Id : conv.participant1Id,
+            firstName: isParticipant1 ? 
+              conv.participant2Name.split(' ')[0] : 
+              conv.participant1Name.split(' ')[0],
+            lastName: isParticipant1 ? 
+              conv.participant2Name.split(' ').slice(1).join(' ') : 
+              conv.participant1Name.split(' ').slice(1).join(' '),
+            email: isParticipant1 ? conv.participant2Email : conv.participant1Email
+          }
+        };
+      }).sort((a, b) => 
+        new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+      );
+      
+      this.loadingConversations = false;
+    },
+    error: (err) => {
+      console.error('Error loading conversations:', err);
+      this.loadingConversations = false;
+    }
+  });
+}
 
   loadUnreadCount(): void {
     this.messageService.getUnreadCount().subscribe({
@@ -820,9 +839,14 @@ export class StudentMessagesComponent implements OnInit, OnDestroy {
   }
 
   selectConversation(conversation: Conversation): void {
-    this.selectedConversation = conversation;
-    this.loadMessages(conversation.id);
+  console.log('Selecting conversation:', conversation);
+  if (!conversation.otherParticipant) {
+    console.error('Conversation missing otherParticipant data');
+    return;
   }
+  this.selectedConversation = conversation;
+  this.loadMessages(conversation.id);
+}
 
   loadMessages(conversationId: number): void {
     this.loadingMessages = true;
@@ -841,29 +865,32 @@ export class StudentMessagesComponent implements OnInit, OnDestroy {
   }
 
   sendMessage(): void {
-    if (!this.newMessage.trim() || !this.selectedConversation || !this.currentUserId) {
+    if (!this.newMessage.trim() || !this.selectedConversation?.otherParticipant || !this.currentUserId) {
+      console.warn('Cannot send message: missing data', {
+        hasMessage: !!this.newMessage.trim(),
+        hasConversation: !!this.selectedConversation,
+        hasOtherParticipant: !!this.selectedConversation?.otherParticipant,
+        hasCurrentUser: !!this.currentUserId
+      });
       return;
     }
 
-    const wsMessage: WebSocketMessage = {
+    const messageData = {
       senderId: this.currentUserId,
-      receiverId: this.selectedConversation.otherParticipant!.id,
+      receiverId: this.selectedConversation.otherParticipant.id,
       content: this.newMessage.trim(),
-      messageType: 'DIRECTO'
+      messageType: 'DIRECTO' as const
     };
 
-    // Enviar por WebSocket
-    this.wsService.sendMessage(wsMessage);
+    // Enviar por WebSocket si está conectado
+    if (this.wsService.isConnected()) {
+      this.wsService.sendMessage(messageData);
+    }
 
     // También enviar por HTTP como respaldo
-    this.messageService.sendMessage({
-      senderId: this.currentUserId,
-      receiverId: this.selectedConversation.otherParticipant!.id,
-      content: this.newMessage.trim(),
-      messageType: 'DIRECTO'
-    }).subscribe({
+    this.messageService.sendMessage(messageData).subscribe({
       next: (message) => {
-        // El mensaje se agregará cuando llegue por WebSocket
+        console.log('Message sent successfully:', message);
       },
       error: (err) => console.error('Error sending message:', err)
     });
@@ -871,25 +898,27 @@ export class StudentMessagesComponent implements OnInit, OnDestroy {
     this.newMessage = '';
   }
 
-  onTyping(): void {
-    if (!this.selectedConversation || !this.currentUserId) return;
 
-    this.wsService.sendTypingIndicator(
-      this.selectedConversation.otherParticipant!.id,
-      this.currentUserId,
-      true
-    );
+  onTyping(): void {
+    if (!this.selectedConversation?.otherParticipant?.id || !this.currentUserId) {
+      console.warn('Cannot send typing indicator: missing conversation or user data');
+      return;
+    }
+
+    this.wsService.sendTypingIndicator(this.selectedConversation.otherParticipant.id,this.currentUserId,true);
 
     if (this.typingTimeout) {
       clearTimeout(this.typingTimeout);
     }
 
     this.typingTimeout = setTimeout(() => {
-      this.wsService.sendTypingIndicator(
-        this.selectedConversation!.otherParticipant!.id,
-        this.currentUserId!,
-        false
-      );
+      if (this.selectedConversation?.otherParticipant?.id && this.currentUserId) {
+        this.wsService.sendTypingIndicator(
+          this.selectedConversation.otherParticipant.id,
+          this.currentUserId,
+          false
+        );
+      }
     }, 2000);
   }
 
@@ -967,16 +996,36 @@ export class StudentMessagesComponent implements OnInit, OnDestroy {
   }
 
   getInitials(person: any): string {
-    if (!person) return '?';
-    const first = person.firstName?.charAt(0) || '';
-    const last = person.lastName?.charAt(0) || '';
+  if (!person) return '?';
+  
+  // Si es un objeto con firstName y lastName
+  if (person.firstName && person.lastName) {
+    const first = person.firstName.charAt(0) || '';
+    const last = person.lastName.charAt(0) || '';
     return (first + last).toUpperCase() || '?';
   }
-
-  getFullName(person: any): string {
-    if (!person) return 'Usuario';
-    return `${person.firstName || ''} ${person.lastName || ''}`.trim() || 'Usuario';
+  
+  // Si es un nombre completo como string
+  if (typeof person === 'string') {
+    const parts = person.split(' ');
+    const first = parts[0]?.charAt(0) || '';
+    const last = parts[1]?.charAt(0) || '';
+    return (first + last).toUpperCase() || '?';
   }
+  return '?';
+}
+
+getFullName(person: any): string {
+  if (!person) return 'Usuario';
+    if (person.firstName && person.lastName) {
+    return `${person.firstName} ${person.lastName}`.trim() || 'Usuario';
+  }
+    if (typeof person === 'string') {
+    return person || 'Usuario';
+  }
+  
+  return 'Usuario';
+}
 
 
 formatMessageTime(dateString: string): string {
@@ -1135,4 +1184,5 @@ refreshConversations(): void {
     this.loadMessages(this.selectedConversation.id);
         }
     }
+    
 }

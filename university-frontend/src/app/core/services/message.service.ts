@@ -27,21 +27,15 @@ export interface Message {
 
 export interface Conversation {
   id: number;
-  participant1: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  participant2: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
+  participant1Id: number;
+  participant1Name: string;
+  participant1Email: string;
+  participant2Id: number;
+  participant2Name: string;
+  participant2Email: string;
   createdAt: string;
   lastMessageAt: string;
-  lastMessage?: string;
+  lastMessageContent?: string;
   unreadCount: number;
   otherParticipant?: {
     id: number;
