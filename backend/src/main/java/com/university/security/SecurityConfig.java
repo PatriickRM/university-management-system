@@ -48,16 +48,25 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**","/api/public/**", "/actuator/health").permitAll()
+                        // Endpoints públicos
+                        .requestMatchers("/api/auth/**", "/api/public/**", "/actuator/health").permitAll()
+                        // WebSocket endpoints
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/users/search").authenticated() // Búsqueda para todos autenticados
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        // Endpoints de estudiantes
                         .requestMatchers("/api/students/**").hasAnyRole("ADMIN","STUDENT")
+                        // Endpoints de profesores
                         .requestMatchers("/api/professors/**").hasAnyRole("ADMIN","PROFESSOR")
-                        .anyRequest().authenticated())
+                        // Cualquier otro request debe estar autenticado
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -71,7 +80,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-    
+
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
