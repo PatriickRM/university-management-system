@@ -5,14 +5,17 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';  
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { UserSearchDialogComponent } from '../../user-search-dialog/user-search-dialog.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { Subscription } from 'rxjs';
+import { User } from '../../../core/models/user.model';
 
 import { MessageService, Conversation, Message } from '../../../core/services/message.service';
 import { WebSocketService, WebSocketMessage } from '../../../core/services/websocket.service';
@@ -20,6 +23,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-student-messages',
+  
   standalone: true,
   imports: [
     CommonModule,
@@ -34,7 +38,8 @@ import { AuthService } from '../../../core/services/auth.service';
     MatBadgeModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatMenuModule
+    MatMenuModule,
+    MatDialogModule
   ],
   template: `
     <div class="messages-container">
@@ -65,11 +70,19 @@ import { AuthService } from '../../../core/services/auth.service';
         <mat-card class="conversations-panel">
           <div class="panel-header">
             <h3>Conversaciones</h3>
-            @if (unreadCount > 0) {
-              <mat-icon [matBadge]="unreadCount" matBadgeColor="warn" matBadgeSize="small">
-                notifications
-              </mat-icon>
-            }
+            <div class="header-actions">
+              @if (unreadCount > 0) {
+                <mat-icon [matBadge]="unreadCount" matBadgeColor="warn" matBadgeSize="small">
+                  notifications
+                </mat-icon>
+              }
+              <button mat-icon-button 
+                      (click)="openNewConversation()" 
+                      matTooltip="Nueva conversación"
+                      color="primary">
+                <mat-icon>add_comment</mat-icon>
+              </button>
+            </div>
           </div>
 
           @if (loadingConversations) {
@@ -303,7 +316,25 @@ import { AuthService } from '../../../core/services/auth.service';
           color: #2c3e50;
         }
       }
+      .panel-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
+        h3 {
+          margin: 0;
+          font-size: 1.125rem;
+          color: #2c3e50;
+        }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+      }
       .conversations-list {
         flex: 1;
         overflow-y: auto;
@@ -700,6 +731,7 @@ export class StudentMessagesComponent implements OnInit, OnDestroy {
   private messageService = inject(MessageService);
   private wsService = inject(WebSocketService);
   private authService = inject(AuthService);
+  private dialog = inject(MatDialog);
 
   @ViewChild('messagesList') messagesList!: ElementRef;
 
@@ -1071,6 +1103,27 @@ clearChat(): void {
       });
     });
   }
+}
+
+openNewConversation(): void {
+  const dialogRef = this.dialog.open(UserSearchDialogComponent, {
+    width: '600px',
+    maxHeight: '80vh',
+    disableClose: false
+  });
+
+  dialogRef.afterClosed().subscribe((selectedUser: User | undefined) => {
+    if (selectedUser && this.currentUserId) {
+      this.messageService.getOrCreateConversation(selectedUser.id).subscribe({
+        next: (conversation) => {
+          this.selectConversation(conversation);
+          // Recargar conversaciones para mostrar la nueva
+          this.loadConversations();
+        },
+        error: (err) => console.error('Error creating conversation:', err)
+      });
+    }
+  });
 }
 
 //Refresh 

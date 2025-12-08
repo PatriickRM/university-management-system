@@ -91,4 +91,11 @@ public class UserController {
         UserResponseDTO updatedUser = userService.getUserById(id);
         return ResponseEntity.ok(updatedUser);
     }
+
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<UserResponseDTO>> searchUsers(@RequestParam String query) {
+        List<UserResponseDTO> users = userService.searchUsers(query);
+        return ResponseEntity.ok(users);
+    }
 }

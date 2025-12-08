@@ -21,4 +21,5 @@ public interface UserService {
     List<UserResponseDTO> getUsersByRole(String roleName);
     List<UserResponseDTO> getAllUsers();
     Page<UserResponseDTO> getAllUsersPageable(Pageable pageable);
+    List<UserResponseDTO> searchUsers(String query);
 }

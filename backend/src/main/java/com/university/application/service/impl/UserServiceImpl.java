@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -155,4 +156,28 @@ public class UserServiceImpl implements UserService {
         return roles;
     }
 
-}
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponseDTO> searchUsers(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String searchQuery = query.trim().toLowerCase();
+
+        return userRepository.findAll().stream()
+                .filter(user -> {
+                    String fullName = (user.getFirstName() + " " + user.getLastName()).toLowerCase();
+                    String email = user.getEmail().toLowerCase();
+                    String username = user.getUsername().toLowerCase();
+
+                    return fullName.contains(searchQuery) ||
+                            email.contains(searchQuery) ||
+                            username.contains(searchQuery);
+                })
+                .map(userMapper::toResponseDTO)
+                .limit(10) // 10 resultados
+                .collect(Collectors.toList());
+    }
+
+    }
